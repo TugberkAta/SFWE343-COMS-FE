@@ -1,33 +1,74 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/auth-context";
 
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-type StatCardProps = {
-  label: string;
-  value: string;
-  delta?: string;
-  trend?: "up" | "down" | "neutral";
-};
-
-function StatCard({ label, value, delta, trend = "neutral" }: StatCardProps) {
-  const trendColor =
-    trend === "up" ? "text-emerald-600" : trend === "down" ? "text-rose-600" : "text-slate-500";
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && password) {
+      login();
+      navigate("/admin");
+    }
+  };
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-start justify-between">
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</div>
-        {delta ? (
-          <div className={`text-xs font-medium ${trendColor}`}>{delta}</div>
-        ) : null}
-      </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-        {value}
-      </div>
-    </div>
-  );
-}
+    <main className="flex min-h-screen items-center justify-center bg-slate-950">
 
-export default function AdminSignnPage() {
-  return (
-  <div>test</div>
+      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 shadow-lg">
+
+        <h1 className="mb-6 text-center text-2xl font-bold text-white">
+          Course Outline Management System
+        </h1>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+
+          <div>
+            <label className="text-sm text-slate-400">
+              Email
+            </label>
+
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-slate-400">
+              Password
+            </label>
+
+            <Input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <Button type="submit" className="w-full">
+            Sign In
+          </Button>
+
+        </form>
+
+        <div className="mt-6 text-center text-sm text-slate-400">
+          Don’t have an account?
+        </div>
+
+      </div>
+
+    </main>
   );
 }

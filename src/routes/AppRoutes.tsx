@@ -3,25 +3,27 @@ import AdminLayout from "@/app/(adminPanel)/admin/layout";
 import AdminPage from "@/app/(adminPanel)/admin/page";
 import AdminSignInPage from "@/app/(auth)/login/page";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 
 export const AppRoutes = () => {
   return (
     <Routes>
-      {/* Root */}
-      <Route path="/" element={<AdminPage />} />
+      <Route path="/" element={<Navigate to="/admin" replace />} />
 
       <Route path="/sign-in" element={<AdminSignInPage />} />
 
-      {/* Admin Panel - General Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="dashboard" element={<AdminDashboardPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminPage />} />
+          <Route path="dashboard" element={<AdminDashboardPage />} />
+        </Route>
+        <Route path="/settings" element={<AdminLayout />}>
+          <Route path="account" element={<></>} />
+        </Route>
       </Route>
-      <Route path="/settings" element={<AdminLayout />}>
-        <Route path="account" element={<></>} />
-      </Route>
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/admin" />} />
+
+      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   );
 };
