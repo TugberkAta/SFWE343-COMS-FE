@@ -82,7 +82,7 @@ export default function LoginPage() {
                   </div>
 
                   <div className="text-center mt-4">
-                    <p>Don't have an account? <Link to="/sign-up" className="text-primary hover:underline">Sign up</Link></p>
+                    <p>Don't have an account? <Link to="/email-auth" className="text-primary hover:underline">Sign up</Link></p>
                   </div>
                 </form>
               </Form>

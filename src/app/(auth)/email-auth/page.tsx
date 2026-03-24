@@ -13,20 +13,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import emailSignup from "@/services/auth/email-auth";
+import emailAuth from "@/services/auth/email-auth";
 
-const emailSignupFormSchema = z.object({
+const emailAuthFormSchema = z.object({
   email: z.string().email(),
 });
 
-export default function EmailSignupPage() {
-  const form = useForm<z.infer<typeof emailSignupFormSchema>>({
-    resolver: zodResolver(emailSignupFormSchema),
+export default function EmailAuthPage() {
+  const form = useForm<z.infer<typeof emailAuthFormSchema>>({
+    resolver: zodResolver(emailAuthFormSchema),
   });
 
   const handleSubmit = form.handleSubmit(async ({ email }) => {
-    console.log(email);
-    await emailSignup({ email });
+    await emailAuth({ email });
   });
 
   return (
@@ -35,7 +34,7 @@ export default function EmailSignupPage() {
         <div className={cn("flex flex-col gap-6")}>
           <Card>
             <CardHeader className="text-center p-8">
-              <CardTitle className="text-xl">Sign Up</CardTitle>
+              <CardTitle className="text-xl">Verify your email</CardTitle>
             </CardHeader>
             <CardContent className="px-8">
               <Form {...form}>
