@@ -1,62 +1,83 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
-import { email, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+} from "@/components/ui/form";
+import { Link } from "react-router-dom";
 
-const emailSignupSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
+const emailSignupFormSchema = z.object({
+  email: z.string().email(),
 });
 
-type EmailSignupFormData = z.infer<typeof emailSignupSchema>;
-
 export default function EmailSignupPage() {
-  const form = useForm<EmailSignupFormData>({
-    resolver: zodResolver(emailSignupSchema),
-    defaultValues: {
-      email: "",
-    },
+  const form = useForm<z.infer<typeof emailSignupFormSchema>>({
+    resolver: zodResolver(emailSignupFormSchema),
   });
 
-  const onSubmit = (data: EmailSignupFormData) => {
-    console.log("Submitted email:", data.email);
-  };
+  const handleSubmit = form.handleSubmit(async ({ email }) => {
+    console.log(email);
+  });
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+      <div className="flex w-full max-w-md flex-col gap-6">
+        <div className={cn("flex flex-col gap-6")}>
+          <Card>
+            <CardHeader className="text-center p-8">
+              <CardTitle className="text-xl">Sign Up</CardTitle>
+            </CardHeader>
+            <CardContent className="px-8">
+              <Form {...form}>
+                <form onSubmit={handleSubmit}>
+                  <div className="grid gap-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <div className="grid gap-2">
+                          <Label htmlFor="email">Email</Label>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="m@example.com"
+                              required
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      Sign Up
+                    </Button>
+                  </div>
+                </form>
 
-    <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 shadow-lg">
-
-      <h1 className="mb-6 text-center text-2xl font-bold text-white">
-        Course Outline Management System
-      </h1>
-
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-
-        <div>
-          <label className="text-sm text-slate-400">
-            Email
-          </label>
-
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            value={form.getValues("email")}
-            onChange={(e) => form.setValue("email", e.target.value)}
-            required
-          />
+                <div className="text-center mt-4">
+                  <p>
+                    Already have an account?{" "}
+                    <Link
+                      to="/sign-in"
+                      className="text-primary hover:underline"
+                    >
+                      Sign in
+                    </Link>
+                  </p>
+                </div>
+              </Form>
+            </CardContent>
+          </Card>
         </div>
-
-        <Button type="submit" className="w-full">
-          Sign Up
-        </Button>
-
-      </form>
+      </div>
     </div>
-
-  </main>
   );
 }

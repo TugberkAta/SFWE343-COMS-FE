@@ -4,7 +4,6 @@ import AdminPage from "@/app/(adminPanel)/admin/page";
 import AdminSignInPage from "@/app/(auth)/login/page";
 import EmailSignupPage from "@/app/(auth)/signup/page";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 export const AppRoutes = () => {
   return (
@@ -13,14 +12,12 @@ export const AppRoutes = () => {
       <Route path="/sign-in" element={<AdminSignInPage />} />
       <Route path="/sign-up" element={<EmailSignupPage />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminPage />} />
-          <Route path="dashboard" element={<AdminDashboardPage />} />
-        </Route>
-        <Route path="/settings" element={<AdminLayout />}>
-          <Route path="account" element={<></>} />
-        </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminPage />} />
+        <Route path="dashboard" element={<AdminDashboardPage />} />
+      </Route>
+      <Route path="/settings" element={<AdminLayout />}>
+        <Route path="account" element={<></>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin" replace />} />

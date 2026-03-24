@@ -1,74 +1,94 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/auth-context";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+} from "@/components/ui/form";
+import { Link } from "react-router-dom";
+
+const loginFormSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email && password) {
-      login();
-      navigate("/admin");
-    }
-  };
+  const handleSubmit = form.handleSubmit(async ({ email, password }) => {
+    console.log(email, password);
+  });
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+      <div className="flex w-full max-w-md flex-col gap-6">
+        <div className={cn("flex flex-col gap-6")}>
+          <Card>
+            <CardHeader className="text-center p-8">
+              <CardTitle className="text-xl">Sign In</CardTitle>
+            </CardHeader>
+            <CardContent className="px-8">
+              <Form {...form}>
+                <form onSubmit={handleSubmit}>
+                  <div className="grid gap-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <div className="grid gap-2">
+                          <Label htmlFor="email">Email</Label>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="m@example.com"
+                              required
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <div className="grid gap-2">
+                          <Label htmlFor="password">Password</Label>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="********"
+                              type="password"
+                              required
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      Login
+                    </Button>
+                  </div>
 
-      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 shadow-lg">
-
-        <h1 className="mb-6 text-center text-2xl font-bold text-white">
-          Course Outline Management System
-        </h1>
-
-        <form onSubmit={handleLogin} className="space-y-4">
-
-          <div>
-            <label className="text-sm text-slate-400">
-              Email
-            </label>
-
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-slate-400">
-              Password
-            </label>
-
-            <Input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <Button type="submit" className="w-full">
-            Sign In
-          </Button>
-
-        </form>
-
-        <div className="mt-6 text-center text-sm text-slate-400">
-          Don’t have an account?
+                  <div className="text-center mt-4">
+                    <p>Don't have an account? <Link to="/sign-up" className="text-primary hover:underline">Sign up</Link></p>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
         </div>
-
       </div>
-
-    </main>
+    </div>
   );
 }
