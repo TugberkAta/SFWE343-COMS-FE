@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
+import emailSignup from "@/services/auth/email-auth";
 
 const emailSignupFormSchema = z.object({
   email: z.string().email(),
@@ -25,6 +26,7 @@ export default function EmailSignupPage() {
 
   const handleSubmit = form.handleSubmit(async ({ email }) => {
     console.log(email);
+    await emailSignup({ email });
   });
 
   return (

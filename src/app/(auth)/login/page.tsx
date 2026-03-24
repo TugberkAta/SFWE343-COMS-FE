@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
+import login from "@/services/auth/login";
 
 const loginFormSchema = z.object({
   email: z.string().email(),
@@ -25,7 +26,7 @@ export default function LoginPage() {
   });
 
   const handleSubmit = form.handleSubmit(async ({ email, password }) => {
-    console.log(email, password);
+    login({ email, password });
   });
 
   return (
