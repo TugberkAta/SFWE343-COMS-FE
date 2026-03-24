@@ -11,7 +11,7 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/admin" replace />} />
       <Route path="/sign-in" element={<AdminSignInPage />} />
-      <Route path="/signup" element={<EmailSignupPage />} />
+      <Route path="/sign-up" element={<EmailSignupPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/admin" element={<AdminLayout />}>

@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { email, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const emailSignupSchema = z.object({
   email: z
@@ -24,42 +26,37 @@ export default function EmailSignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-xl border bg-white p-8 shadow-sm">
-        <h1 className="mb-2 text-2xl font-semibold">Email Sign Up</h1>
-        <p className="mb-6 text-sm text-gray-600">
-          Enter your email address to continue.
-        </p>
+    <main className="flex min-h-screen items-center justify-center bg-slate-950">
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-medium">
-              Email
-            </label>
+    <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 shadow-lg">
 
-            <input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              {...form.register("email")}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-black text-black"
-            />
+      <h1 className="mb-6 text-center text-2xl font-bold text-white">
+        Course Outline Management System
+      </h1>
 
-            {form.formState.errors.email && (
-              <p className="mt-2 text-sm text-red-500">
-                {form.formState.errors.email.message}
-              </p>
-            )}
-          </div>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-black px-4 py-2 text-white"
-          >
-            Sign Up
-          </button>
-        </form>
-      </div>
+        <div>
+          <label className="text-sm text-slate-400">
+            Email
+          </label>
+
+          <Input
+            type="email"
+            placeholder="Enter your email"
+            value={form.getValues("email")}
+            onChange={(e) => form.setValue("email", e.target.value)}
+            required
+          />
+        </div>
+
+        <Button type="submit" className="w-full">
+          Sign Up
+        </Button>
+
+      </form>
     </div>
+
+  </main>
   );
 }
