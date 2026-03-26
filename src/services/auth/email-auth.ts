@@ -12,7 +12,7 @@ const emailAuth = ({
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   return http.post(`${apiBaseUrl}${endpoint}`, {
-    email,
+    data: { email },
   });
 };
 

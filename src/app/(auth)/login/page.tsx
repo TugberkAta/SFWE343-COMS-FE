@@ -12,8 +12,12 @@ import {
   FormField,
   FormMessage,
 } from "@/components/ui/form";
-import { Link } from "react-router-dom";
-import login from "@/services/auth/login";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
+import Authentication from "@/services/auth/authentication";
+
+const authentication = new Authentication();
 
 const loginFormSchema = z.object({
   email: z.string().email(),
@@ -21,12 +25,25 @@ const loginFormSchema = z.object({
 });
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
   });
 
   const handleSubmit = form.handleSubmit(async ({ email, password }) => {
-    login({ email, password });
+    try {
+      await authentication.login({ email, password });
+      toast.success("You're signed in.");
+      navigate("/admin", { replace: true });
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data
+        toast.error(message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
   });
 
   return (
@@ -35,7 +52,7 @@ export default function LoginPage() {
         <div className={cn("flex flex-col gap-6")}>
           <Card>
             <CardHeader className="text-center p-8">
-              <CardTitle className="text-xl">Sign In</CardTitle>
+              <CardTitle className="text-xl">Login</CardTitle>
             </CardHeader>
             <CardContent className="px-8">
               <Form {...form}>
@@ -76,13 +93,17 @@ export default function LoginPage() {
                         </div>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      Login
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={form.formState.isSubmitting}
+                    >
+                      {form.formState.isSubmitting ? "Logging in…" : "Login"}
                     </Button>
                   </div>
 
                   <div className="text-center mt-4">
-                    <p>Don't have an account? <Link to="/email-auth" className="text-primary hover:underline">Sign up</Link></p>
+                    <p>Don't have an account? <Link to="/email-auth" className="text-primary hover:underline">Create an account</Link></p>
                   </div>
                 </form>
               </Form>

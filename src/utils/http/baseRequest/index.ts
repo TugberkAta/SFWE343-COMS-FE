@@ -2,14 +2,28 @@
 import axios from "axios";
 import type { AxiosPromise } from "axios";
 import qs from "qs";
+import Authentication from "@/services/auth/authentication";
 
-
-let auth: any;
+let auth: Authentication | undefined;
 
 const buildHeaders = () => {
-  return {
+  if (!auth) {
+    auth = new Authentication();
+  }
+
+  const base = {
     "Content-Type": "application/json;charset=UTF-8",
   };
+
+  if (auth.isAuthenticated()) {
+    const token = auth.getAccessToken();
+    return {
+      ...base,
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
+  return base;
 };
 
 const baseRequest = <T = any>(url: string, options = {}) => {
@@ -23,14 +37,8 @@ const baseRequest = <T = any>(url: string, options = {}) => {
     },
   }) as AxiosPromise<T>;
 };
-// @ts-ignore
-enum RequestMethod {
-  get = "get",
-  post = "post",
-  put = "put",
-  patch = "patch",
-  delete = "delete",
-}
+
+type AxiosFormMethod = "get" | "post" | "put" | "patch" | "delete";
 
 export const baseRequestWithFormData = (
   url: string,
@@ -38,7 +46,7 @@ export const baseRequestWithFormData = (
   options: any = {},
 ) => {
   const { headers = {}, ...opts }: any = options;
-  const method: RequestMethod = options.method || "get";
+  const method = (options.method || "get") as AxiosFormMethod;
 
   return axios[method](url, formData, {
     headers: { ...buildHeaders(), ...headers },

@@ -13,6 +13,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
 import emailAuth from "@/services/auth/email-auth";
 
 const emailAuthFormSchema = z.object({
@@ -25,7 +27,17 @@ export default function EmailAuthPage() {
   });
 
   const handleSubmit = form.handleSubmit(async ({ email }) => {
-    await emailAuth({ email });
+    try {
+      await emailAuth({ email });
+      toast.success("Check your email for a sign-in link.");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data
+        toast.error(message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
   });
 
   return (
@@ -57,8 +69,12 @@ export default function EmailAuthPage() {
                         </div>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      Sign Up
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={form.formState.isSubmitting}
+                    >
+                      {form.formState.isSubmitting ? "Sending…" : "Sign Up"}
                     </Button>
                   </div>
                 </form>
