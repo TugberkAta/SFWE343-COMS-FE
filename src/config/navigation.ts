@@ -34,6 +34,12 @@ export const getMainNavigation = (): NavMainItem[] => {
       isActive: true,
       elementLinkId: "dashboard-link",
     },
+    {
+  title: "Pending Users",
+  url: "/pending-users",
+  icon: LayoutDashboard,
+  elementLinkId: "pending-users-link",
+},
   ];
 
   return baseNavigation;

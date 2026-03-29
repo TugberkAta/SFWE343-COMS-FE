@@ -5,7 +5,7 @@ import SignInPage from "@/app/(auth)/signin/page";
 import { Navigate, Route, Routes } from "react-router-dom";
 import EmailAuthPage from "@/app/(auth)/email-auth/page";
 import LoginPage from "@/app/(auth)/login/page";
-
+import PendingUsersPage from "@/app/(adminPanel)/pending-users/page";
 export const AppRoutes = () => {
   return (
     <Routes>
@@ -13,7 +13,7 @@ export const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/sign-in" element={<SignInPage />} />
       <Route path="/email-auth" element={<EmailAuthPage />} />
-
+      <Route path="/pending-users" element={<PendingUsersPage />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminPage />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
