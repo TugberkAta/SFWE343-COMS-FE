@@ -6,7 +6,4 @@ export const paths = {
       account: "/admin/settings/account",
     },
   },
-  settings: {
-    index: "/admin/settings/account",
-  },
 };

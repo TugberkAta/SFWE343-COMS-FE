@@ -24,9 +24,7 @@ export const AppRoutes = () => {
         <Route index element={<AdminPage />} />
         <Route path="pending-users" element={<PendingUsersPage />} />
         <Route path="users-with-role" element={<UsersWithRolePage />} />
-      </Route>
-      <Route path="/settings" element={<AdminLayout />}>
-        <Route path="account" element={<SettingsAccountPage />} />
+        <Route path="settings/account" element={<SettingsAccountPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin" replace />} />

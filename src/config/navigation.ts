@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   type LucideIcon,
   Settings2,
+  User,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -41,12 +42,6 @@ export const getMainNavigation = (): NavMainItem[] => {
       icon: Users,
       elementLinkId: "users-with-role-link",
     },
-    {
-  title: "Pending Users",
-  url: "/pending-users",
-  icon: LayoutDashboard,
-  elementLinkId: "pending-users-link",
-},
   ];
 
   return baseNavigation;
@@ -55,10 +50,10 @@ export const getMainNavigation = (): NavMainItem[] => {
 export const getSettingsNavigation = (): NavSecondaryItem[] => {
   const baseNavigation: NavSecondaryItem[] = [
     {
-      title: "Settings",
-      url: paths.settings.index,
-      icon: Settings2,
-      elementLinkId: "settings-link",
+      title: "Account",
+      url: paths.admin.settings.account,
+      icon: User,
+      elementLinkId: "account-link",
     },
   ];
 
@@ -68,7 +63,7 @@ export const getSettingsNavigation = (): NavSecondaryItem[] => {
 export const secondaryNavigation: NavSecondaryItem[] = [
   {
     title: "Settings",
-    url: paths.settings.index,
+    url: paths.admin.settings.account,
     icon: Settings2,
     elementLinkId: "settings-link",
   },

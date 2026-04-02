@@ -15,6 +15,13 @@ type LoginPayload = {
   password: string;
 };
 
+type UserToken = {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
 class Authentication {
   register({
     firstName,
@@ -38,8 +45,6 @@ class Authentication {
   login({ email, password }: LoginPayload) {
     const loginEndpoint = user.login();
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-    console.log(loginEndpoint, API_BASE_URL)
 
     return axios(`${API_BASE_URL}${loginEndpoint}`, {
       method: "POST",
@@ -77,6 +82,22 @@ class Authentication {
   getAccessTokenPayload() {
     const token = this.getAccessToken();
     return token ? parseJWTPayload(token) : null;
+  }
+
+  getCurrentUser(): UserToken | null {
+    if (!this.isAuthenticated()) {
+      return null;
+    }
+    const payload = this.getAccessTokenPayload();
+    if (!payload) {
+      return null;
+    }
+    return {
+      userId: payload.userId as number,
+      firstName: payload.firstName as string,
+      lastName: payload.lastName as string,
+      email: payload.email as string,
+    };
   }
 }
 
