@@ -1,9 +1,10 @@
 import { paths } from "@/utils/paths";
 import {
-    ArrowLeft,
-  LayoutDashboard,
+  ArrowLeft,
   type LucideIcon,
   Settings2,
+  UserPlus,
+  Users,
 } from "lucide-react";
 
 export interface NavMainItem {
@@ -28,11 +29,17 @@ export interface NavSecondaryItem {
 export const getMainNavigation = (): NavMainItem[] => {
   const baseNavigation: NavMainItem[] = [
     {
-      title: "Dashboard",
-      url: paths.admin.dashboard,
-      icon: LayoutDashboard,
+      title: "Pending Users",
+      url: paths.admin.pendingUsers,
+      icon: UserPlus,
       isActive: true,
-      elementLinkId: "dashboard-link",
+      elementLinkId: "pending-users-link",
+    },
+    {
+      title: "Users",
+      url: paths.admin.usersWithRole,
+      icon: Users,
+      elementLinkId: "users-with-role-link",
     },
     {
   title: "Pending Users",
@@ -59,20 +66,20 @@ export const getSettingsNavigation = (): NavSecondaryItem[] => {
 };
 
 export const secondaryNavigation: NavSecondaryItem[] = [
-    {
-      title: "Settings",
-      url: paths.settings.index,
-      icon: Settings2,
-      elementLinkId: "settings-link",
-    },
-  ];
-  
-  export const settingsSecondaryNavigation: NavSecondaryItem[] = [
-    {
-      title: "Back to main",
-      url: paths.admin.dashboard,
-      icon: ArrowLeft,
-      elementLinkId: "back-to-main-link",
-    },
-  ];
+  {
+    title: "Settings",
+    url: paths.settings.index,
+    icon: Settings2,
+    elementLinkId: "settings-link",
+  },
+];
+
+export const settingsSecondaryNavigation: NavSecondaryItem[] = [
+  {
+    title: "Back to main",
+    url: paths.admin.pendingUsers,
+    icon: ArrowLeft,
+    elementLinkId: "back-to-main-link",
+  },
+];
   
