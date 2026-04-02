@@ -37,10 +37,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="h-auto py-3 hover:bg-(--sidebar-logo-bg) data-[state=open]:bg-(--sidebar-logo-bg)"
             >
-              <Link to="/dashboard">
+              <Link to="/admin">
                 <div className="flex flex-col items-center justify-center w-full">
                   <SettingsIcon />
-                  <span className="text-sm font-semibold">Dashboard</span>
+                  <span className="text-sm font-semibold">Admin</span>
                 </div>
               </Link>
             </SidebarMenuButton>

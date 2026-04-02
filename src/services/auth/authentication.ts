@@ -39,6 +39,8 @@ class Authentication {
     const loginEndpoint = user.login();
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+    console.log(loginEndpoint, API_BASE_URL)
+
     return axios(`${API_BASE_URL}${loginEndpoint}`, {
       method: "POST",
       data: { email, password },

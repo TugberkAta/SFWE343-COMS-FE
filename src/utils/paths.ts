@@ -1,6 +1,7 @@
 export const paths = {
   admin: {
-    dashboard: "/admin/dashboard",
+    pendingUsers: "/admin/pending-users",
+    usersWithRole: "/admin/users-with-role",
   },
   settings: {
     index: "/settings",
