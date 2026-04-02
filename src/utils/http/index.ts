@@ -30,8 +30,8 @@ function get<T = unknown>(url: string, options = {}) {
   });
 }
 
-function post(url: string, options = {}) {
-  return baseRequest(url, {
+function post<T = unknown>(url: string, options = {}) {
+  return baseRequest<T>(url, {
     ...options,
     method: "post",
   });

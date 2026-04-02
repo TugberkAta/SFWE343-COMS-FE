@@ -4,4 +4,11 @@ const user = {
   register: () => `/register`,
 };
 
-export { user };
+const users = {
+  withNoRole: () => `/users/no-role`,
+  withRole: () => `/users/with-role`,
+  approveUser: () => `/approve-user`,
+  userRoles: () => `/user-roles`,
+};
+
+export { user, users };
