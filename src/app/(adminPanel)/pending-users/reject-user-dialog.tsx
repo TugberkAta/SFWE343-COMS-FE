@@ -1,6 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Dialog,
   DialogContent,
@@ -10,7 +13,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+import postRejectUser from "@/services/users/post-reject-user"
 import type { UserWithNoRole } from "@/types/user-with-no-role"
+
+const rejectFormSchema = z.object({})
+
+type RejectFormValues = z.infer<typeof rejectFormSchema>
 
 function displayName(user: UserWithNoRole) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "—"
@@ -29,40 +38,33 @@ export function RejectUserDialog({
   user,
   onRejected,
 }: RejectUserDialogProps) {
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const form = useForm<RejectFormValues>({
+    resolver: zodResolver(rejectFormSchema),
+    defaultValues: {},
+  })
 
   React.useEffect(() => {
-    if (open) setIsSubmitting(false)
-  }, [open, user?.userId])
+    if (open) {
+      form.reset({})
+    }
+  }, [open, user?.userId, form])
 
   const handleDismiss = () => {
-    if (isSubmitting) return
+    if (form.formState.isSubmitting) return
     onOpenChange(false)
   }
 
-  const handleConfirm = async () => {
+  const onSubmit = form.handleSubmit(async () => {
     if (!user) return
-    setIsSubmitting(true)
     try {
-      const response = await fetch("/api/pending-users/reject", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: user.email }),
+      await postRejectUser({
+        userId: user.userId,
       })
-
-      if (!response.ok) {
-        throw new Error("Reject request failed")
-      }
-
       await onRejected()
     } catch (error) {
       console.error("Reject error:", error)
-    } finally {
-      setIsSubmitting(false)
     }
-  }
+  })
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
@@ -75,43 +77,46 @@ export function RejectUserDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {user ? (
-          <div
-            className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm"
-            role="region"
-            aria-label="User to reject"
-          >
-            <dl className="space-y-2">
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                <dt className="shrink-0 text-muted-foreground">Name</dt>
-                <dd className="font-medium">{displayName(user)}</dd>
+        <Form {...form} key={user?.userId ?? "closed"}>
+          <form onSubmit={onSubmit} className="space-y-4">
+            {user ? (
+              <div
+                className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm"
+                role="region"
+                aria-label="User to reject"
+              >
+                <dl className="space-y-2">
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                    <dt className="shrink-0 text-muted-foreground">Name</dt>
+                    <dd className="font-medium">{displayName(user)}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+                    <dt className="shrink-0 text-muted-foreground">Email</dt>
+                    <dd className="break-all font-medium">{user.email}</dd>
+                  </div>
+                </dl>
               </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                <dt className="shrink-0 text-muted-foreground">Email</dt>
-                <dd className="break-all font-medium">{user.email}</dd>
-              </div>
-            </dl>
-          </div>
-        ) : null}
+            ) : null}
 
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleDismiss}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isSubmitting || !user}
-          >
-            {isSubmitting ? "Rejecting…" : "Reject request"}
-          </Button>
-        </DialogFooter>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDismiss}
+                disabled={form.formState.isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={form.formState.isSubmitting || !user}
+              >
+                {form.formState.isSubmitting ? "Rejecting…" : "Reject request"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

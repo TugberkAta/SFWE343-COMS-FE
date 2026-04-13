@@ -52,6 +52,7 @@ export default function LoginPage() {
         <div className={cn("flex flex-col gap-6")}>
           <Card>
             <CardHeader className="text-center p-8">
+              <img src="https://study-more.com/wp-content/uploads/2024/04/fiu-unv-logo.png" alt="" />
               <CardTitle className="text-xl">Login</CardTitle>
             </CardHeader>
             <CardContent className="px-8">
