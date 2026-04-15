@@ -7,6 +7,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import PendingUsersPage from "@/app/(adminPanel)/pending-users/page";
 import UsersWithRolePage from "@/app/(adminPanel)/users-with-role/page";
 import TeacherOutlinesPage from "@/app/(adminPanel)/teacher-outlines/page";
+import FacultiesPage from "@/app/(adminPanel)/faculties/page";
+import ProgramsPage from "@/app/(adminPanel)/programs/page";
 import { paths } from "@/utils/paths";
 
 export const AppRoutes = () => {
@@ -22,8 +24,10 @@ export const AppRoutes = () => {
       <Route path="/email-auth" element={<EmailAuthPage />} />
 
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<TeacherOutlinesPage />} />
+        <Route index element={<FacultiesPage />} />
         <Route path="teacher-outlines" element={<TeacherOutlinesPage />} />
+        <Route path="faculties" element={<FacultiesPage />} />
+        <Route path="programs" element={<ProgramsPage />} />
         <Route path="pending-users" element={<PendingUsersPage />} />
         <Route path="users-with-role" element={<UsersWithRolePage />} />
         <Route path="settings/account" element={<SettingsAccountPage />} />

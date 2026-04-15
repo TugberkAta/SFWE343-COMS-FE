@@ -11,4 +11,16 @@ const users = {
   userRoles: () => `/user-roles`,
 };
 
-export { user, users };
+const departments = {
+  getAll: () => `/departments`,
+};
+
+const programs = {
+  getAll: () => `/programs`,
+};
+
+const outlines = {
+  getAll: () => `/outlines`,
+};
+
+export { user, users, departments, programs, outlines };
