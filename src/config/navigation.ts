@@ -4,7 +4,6 @@ import {
   type LucideIcon,
   Settings2,
   User,
-  UserPlus,
   Users,
 } from "lucide-react";
 
@@ -30,10 +29,15 @@ export interface NavSecondaryItem {
 export const getMainNavigation = (): NavMainItem[] => {
   const baseNavigation: NavMainItem[] = [
     {
+      title: "Course Outline",
+      url: paths.admin.faculties,
+      icon: Users,
+      elementLinkId: "teacher-outlines-link",
+    },
+    {
       title: "Pending Users",
       url: paths.admin.pendingUsers,
-      icon: UserPlus,
-      isActive: true,
+      icon: User,
       elementLinkId: "pending-users-link",
     },
     {

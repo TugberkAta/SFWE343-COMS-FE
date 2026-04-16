@@ -56,9 +56,19 @@ export function NavMain({ items, label }: NavMainProps) {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={item.title}>
                   {item.items?.length ? (
-                    <CollapsibleTrigger className="text-sidebar-foreground/70">
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
+                    <CollapsibleTrigger asChild className="text-sidebar-foreground/70">
+                      <Link
+                        to={item.url ?? "#"}
+                        id={item.elementLinkId}
+                        data-active={
+                          item.url === pathname ||
+                          item.items?.some((subItem) => subItem.url === pathname)
+                        }
+                        className="flex items-center gap-2"
+                      >
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </Link>
                     </CollapsibleTrigger>
                   ) : (
                     <Link

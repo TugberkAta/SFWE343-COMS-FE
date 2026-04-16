@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { AxiosPromise } from "axios";
 
 const useFetchData = (
-  apiCallFn: () => AxiosPromise<any> | Promise<{ data: never[] }>,
+  apiCallFn: () => AxiosPromise<any> | Promise<any>,
   deps: any = [],
   options: {
     enabled?: boolean;
@@ -16,7 +16,7 @@ const useFetchData = (
   const fetchData = async () => {
     try {
       const response = await apiCallFn();
-      setData(response.data);
+      setData(response.data || response);
       setError(false);
       setLoading(false);
     } catch (error: any) {
