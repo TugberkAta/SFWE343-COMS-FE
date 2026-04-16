@@ -2,64 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { FacultyProgramCard } from "@/components/FacultyProgramCard";
 import { useBreadcrumb } from "@/contexts/breadcrumb-context";
 import { useEffect } from "react";
-
-const departments = [
-  {
-    departmentId: 6,
-    type: "undergraduate",
-    name: "Faculty of Architecture and Fine Arts",
-  },
-  {
-    departmentId: 5,
-    type: "undergraduate",
-    name: "Faculty of Arts and Sciences",
-  },
-  {
-    departmentId: 8,
-    type: "undergraduate",
-    name: "Faculty of Dentistry",
-  },
-  {
-    departmentId: 4,
-    type: "undergraduate",
-    name: "Faculty of Economics and Administrative Sciences",
-  },
-  {
-    departmentId: 2,
-    type: "undergraduate",
-    name: "Faculty of Educational Sciences",
-  },
-  {
-    departmentId: 3,
-    type: "undergraduate",
-    name: "Faculty of Engineering",
-  },
-  {
-    departmentId: 7,
-    type: "undergraduate",
-    name: "Faculty of Health Sciences",
-  },
-  {
-    departmentId: 1,
-    type: "undergraduate",
-    name: "Faculty of Law",
-  },
-  {
-    departmentId: 9,
-    type: "undergraduate",
-    name: "Faculty of Pharmacy",
-  },
-  {
-    departmentId: 10,
-    type: "masters",
-    name: "Institute of Graduate Studies",
-  },
-  {
-    departmentId: 11,
-    type: "phd",
-    name: "Institute of Graduate Studies",
-  },
-];
+import useFetchData from "@/hooks/use-fetch-data";
+import {
+  getDepartments,
+  type Department,
+} from "@/services/departments";
 
 const topVariants = [
   "bg-[#232323]",
@@ -71,10 +18,17 @@ const topVariants = [
 const FacultiesPage = () => {
   const navigate = useNavigate();
   const { setBreadcrumbItem } = useBreadcrumb();
+  const [loading, error, data] =
+    useFetchData(getDepartments);
+
+  const departments: Department[] = data.departments || [];
 
   useEffect(() => {
     setBreadcrumbItem("/admin", "Faculties");
   }, [setBreadcrumbItem]);
+
+  if (loading) return <div className="p-6 text-white">Loading faculties...</div>;
+  if (error) return <div className="p-6 text-red-400">Error loading faculties.</div>;
 
   return (
     <div className="space-y-8 p-6">
@@ -92,8 +46,10 @@ const FacultiesPage = () => {
           <FacultyProgramCard
             key={department.departmentId}
             title={department.name}
-            posterTitle="Faculty"
-            posterSubtitle={String(index + 1)}
+            posterTitle={department.name}
+            posterSubtitle={department.type.toUpperCase()}
+            description="Browse all programs offered by this faculty."
+            ctaLabel="View programs"
             topClassName={topVariants[index % topVariants.length]}
             onClick={() =>
               navigate(`/admin/programs?departmentId=${department.departmentId}`)

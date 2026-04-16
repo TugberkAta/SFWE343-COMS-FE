@@ -30,7 +30,7 @@ export const getMainNavigation = (): NavMainItem[] => {
   const baseNavigation: NavMainItem[] = [
     {
       title: "Course Outline",
-      url: paths.admin.teacherOutlines,
+      url: paths.admin.faculties,
       icon: Users,
       elementLinkId: "teacher-outlines-link",
     },
