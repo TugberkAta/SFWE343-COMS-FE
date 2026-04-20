@@ -4,6 +4,7 @@ export const paths = {
     pendingUsers: "/admin/pending-users",
     usersWithRole: "/admin/users-with-role",
     teacherOutlines: "/admin/teacher-outlines",
+    courses: "/admin/courses",
     settings: {
       account: "/admin/settings/account",
     },

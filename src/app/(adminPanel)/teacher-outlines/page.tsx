@@ -1,10 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Pencil, Trash2, Download } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import useFetchData from "@/hooks/use-fetch-data";
-import { getOutlines } from "@/services/outlines";
+import { deleteOutlineById, getOutlinePdfById, getOutlines } from "@/services/outlines";
+import CreateOutlineDialog from "./components/create-outline-dialog";
 
 type Outline = {
   outlineId: number;
@@ -32,10 +42,19 @@ function StatusBadge({ status }: { status: Outline["status"] }) {
 }
 
 export default function TeacherOutlinesPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [downloadingOutlineId, setDownloadingOutlineId] = useState<number | null>(null);
+  const [deletingOutlineId, setDeletingOutlineId] = useState<number | null>(null);
+  const [outlinePendingDelete, setOutlinePendingDelete] = useState<{
+    outlineId: number;
+    courseCode?: string;
+  } | null>(null);
   const programId = searchParams.get("programId");
+  const courseId = searchParams.get("courseId");
+  const selectedCourseId = courseId ? Number(courseId) : 0;
 
-  const [loading, error, data] = useFetchData(getOutlines);
+  const [loading, error, data, refetchOutlines] = useFetchData(getOutlines);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading outlines</div>;
@@ -46,6 +65,44 @@ export default function TeacherOutlinesPage() {
   if (programId) {
     filteredOutlines = filteredOutlines.filter((outline: any) => outline.programId === parseInt(programId));
   }
+  if (courseId) {
+    filteredOutlines = filteredOutlines.filter((outline: any) => outline.courseId === parseInt(courseId));
+  }
+
+  const handleDownloadOutline = async (outlineId: number, courseCode?: string) => {
+    try {
+      setDownloadingOutlineId(outlineId);
+      const response = await getOutlinePdfById(outlineId);
+      const pdfBlob =
+        response.data instanceof Blob
+          ? response.data
+          : new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${courseCode || `outline-${outlineId}`}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (downloadError) {
+      console.error("Failed to download outline PDF", downloadError);
+    } finally {
+      setDownloadingOutlineId(null);
+    }
+  };
+
+  const handleDeleteOutline = async (outlineId: number) => {
+    try {
+      setDeletingOutlineId(outlineId);
+      await deleteOutlineById(outlineId);
+      await refetchOutlines();
+    } catch (deleteError) {
+      console.error("Failed to delete outline", deleteError);
+    } finally {
+      setDeletingOutlineId(null);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 text-white">
@@ -61,9 +118,7 @@ export default function TeacherOutlinesPage() {
           <Button variant="outline" className="border-white/10 text-white hover:bg-white/10">
             Export All PDF
           </Button>
-          <Button className="bg-white text-black hover:bg-gray-200">
-            + Create Outline
-          </Button>
+          <CreateOutlineDialog courseId={selectedCourseId} />
         </div>
       </div>
 
@@ -104,16 +159,43 @@ export default function TeacherOutlinesPage() {
                   </TableCell>
 
                   <TableCell className="flex justify-end gap-2">
-                    <Button size="icon" variant="ghost">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => navigate(`/admin/teacher-outlines/${item.outlineId}`)}
+                    >
                       <Eye size={16} />
                     </Button>
-                    <Button size="icon" variant="ghost">
-                      <Pencil size={16} />
-                    </Button>
-                    <Button size="icon" variant="ghost">
+                    <CreateOutlineDialog
+                      courseId={item.courseId}
+                      outlineId={item.outlineId}
+                      trigger={
+                        <Button size="icon" variant="ghost">
+                          <Pencil size={16} />
+                        </Button>
+                      }
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        setOutlinePendingDelete({
+                          outlineId: item.outlineId,
+                          courseCode: item.courseCode,
+                        })
+                      }
+                      disabled={deletingOutlineId === item.outlineId}
+                    >
                       <Trash2 size={16} />
                     </Button>
-                    <Button size="icon" variant="ghost">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        handleDownloadOutline(item.outlineId, item.courseCode)
+                      }
+                      disabled={downloadingOutlineId === item.outlineId}
+                    >
                       <Download size={16} />
                     </Button>
                   </TableCell>
@@ -124,6 +206,50 @@ export default function TeacherOutlinesPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog
+        open={Boolean(outlinePendingDelete)}
+        onOpenChange={(open) => {
+          if (!open && deletingOutlineId === null) {
+            setOutlinePendingDelete(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete outline?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone.{" "}
+              {outlinePendingDelete?.courseCode
+                ? `The outline for ${outlinePendingDelete.courseCode} will be permanently removed.`
+                : "This outline will be permanently removed."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOutlinePendingDelete(null)}
+              disabled={deletingOutlineId !== null}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (!outlinePendingDelete) return;
+                await handleDeleteOutline(outlinePendingDelete.outlineId);
+                setOutlinePendingDelete(null);
+              }}
+              disabled={
+                !outlinePendingDelete ||
+                deletingOutlineId === outlinePendingDelete.outlineId
+              }
+            >
+              Confirm delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

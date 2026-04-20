@@ -20,8 +20,21 @@ const programs = {
   getAll: () => `/programs`,
 };
 
-const outlines = {
-  getAll: () => `/outlines`,
+const courses = {
+  getAll: () => `/courses`,
 };
 
-export { user, users, departments, programs, outlines };
+const terms = {
+  getAll: () => `/terms`,
+};
+
+const outlines = {
+  getAll: () => `/outlines`,
+  create: () => `/course-outline`,
+  patchById: (outlineId: number) => `/course-outline/${outlineId}`,
+  getById: (outlineId: number) => `/outlines/${outlineId}`,
+  getPdfById: (outlineId: number) => `/outlines/${outlineId}/pdf`,
+  deleteById: (outlineId: number) => `/outlines/${outlineId}`,
+};
+
+export { user, users, departments, programs, courses, terms, outlines };

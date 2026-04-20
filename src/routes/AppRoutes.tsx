@@ -9,6 +9,8 @@ import UsersWithRolePage from "@/app/(adminPanel)/users-with-role/page";
 import TeacherOutlinesPage from "@/app/(adminPanel)/teacher-outlines/page";
 import FacultiesPage from "@/app/(adminPanel)/faculties/page";
 import ProgramsPage from "@/app/(adminPanel)/programs/page";
+import CoursesPage from "@/app/(adminPanel)/courses/page";
+import TeacherOutlineDetailsPage from "@/app/(adminPanel)/teacher-outlines/details/page";
 import { paths } from "@/utils/paths";
 
 export const AppRoutes = () => {
@@ -26,8 +28,10 @@ export const AppRoutes = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<FacultiesPage />} />
         <Route path="teacher-outlines" element={<TeacherOutlinesPage />} />
+        <Route path="teacher-outlines/:outlineId" element={<TeacherOutlineDetailsPage />} />
         <Route path="faculties" element={<FacultiesPage />} />
         <Route path="programs" element={<ProgramsPage />} />
+        <Route path="courses" element={<CoursesPage />} />
         <Route path="pending-users" element={<PendingUsersPage />} />
         <Route path="users-with-role" element={<UsersWithRolePage />} />
         <Route path="settings/account" element={<SettingsAccountPage />} />
