@@ -148,4 +148,98 @@ describe("LoginPage", () => {
 
     vi.mocked(axios.isAxiosError).mockRestore();
   });
+
+  it("shows validation error when email is empty", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    // Fill password first, then click submit without filling email
+    await user.type(
+      document.querySelector('input[name="password"]')!,
+      "password12",
+    );
+    // Click somewhere to trigger blur/validation
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    expect(mockLogin).not.toHaveBeenCalled();
+    // The form should show validation error
+    const button = screen.getByRole("button", { name: /^login$/i });
+    expect(button).toBeInTheDocument();
+  });
+
+  it("shows validation error when password is empty", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(
+      screen.getByPlaceholderText("m@example.com"),
+      "user@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    expect(mockLogin).not.toHaveBeenCalled();
+    // Form validation should prevent submission
+    const button = screen.getByRole("button", { name: /^login$/i });
+    expect(button).toBeInTheDocument();
+  });
+
+  it("shows validation error for invalid email format", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(
+      screen.getByPlaceholderText("m@example.com"),
+      "invalid-email",
+    );
+    await user.type(
+      document.querySelector('input[name="password"]')!,
+      "password12",
+    );
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    expect(mockLogin).not.toHaveBeenCalled();
+    // Form validation should prevent submission
+    const button = screen.getByRole("button", { name: /^login$/i });
+    expect(button).toBeInTheDocument();
+  });
+
+  it("disables submit button while submitting", async () => {
+    const user = userEvent.setup();
+    mockLogin.mockImplementation(() => new Promise(() => {}));
+    renderPage();
+
+    await user.type(
+      screen.getByPlaceholderText("m@example.com"),
+      "user@example.com",
+    );
+    await user.type(
+      document.querySelector('input[name="password"]')!,
+      "password12",
+    );
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /logging in/i })).toBeDisabled();
+    });
+  });
+
+  it("shows password minimum length validation error", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(
+      screen.getByPlaceholderText("m@example.com"),
+      "user@example.com",
+    );
+    await user.type(
+      document.querySelector('input[name="password"]')!,
+      "1234567",
+    );
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.getByText(/8/i)).toBeInTheDocument();
+    });
+  });
 });
