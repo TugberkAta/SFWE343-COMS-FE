@@ -115,9 +115,6 @@ export default function TeacherOutlinesPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" className="border-white/10 text-white hover:bg-white/10">
-            Export All PDF
-          </Button>
           <CreateOutlineDialog courseId={selectedCourseId} />
         </div>
       </div>
