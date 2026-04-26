@@ -1,11 +1,19 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, FileText, Plus, Trash2 } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { CustomDialogContent } from "@/components/ui/customDialogContent";
 import {
   Form,
@@ -85,6 +93,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     []
   );
   const [loadingCourses, coursesError, coursesData] = useFetchData(getCourses);
+  const weeklyTopicsCsvInputRef = useRef<HTMLInputElement | null>(null);
+  const [isWeeklyTopicsCsvDialogOpen, setIsWeeklyTopicsCsvDialogOpen] = useState(false);
+  const [weeklyTopicsCsvFile, setWeeklyTopicsCsvFile] = useState<File | null>(null);
+  const [weeklyTopicsCsvDialogError, setWeeklyTopicsCsvDialogError] = useState<string | null>(null);
   const [, , outlineData] = useFetchData(
     () => getOutlineById(Number(outlineId)),
     [outlineId],
@@ -253,6 +265,156 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     );
   };
 
+  const parseCsvLine = (line: string) => {
+    const values: string[] = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let index = 0; index < line.length; index += 1) {
+      const character = line[index];
+      const nextCharacter = line[index + 1];
+
+      if (character === '"' && inQuotes && nextCharacter === '"') {
+        current += '"';
+        index += 1;
+        continue;
+      }
+
+      if (character === '"') {
+        inQuotes = !inQuotes;
+        continue;
+      }
+
+      if (character === "," && !inQuotes) {
+        values.push(current.trim());
+        current = "";
+        continue;
+      }
+
+      current += character;
+    }
+
+    values.push(current.trim());
+    return values;
+  };
+
+  const normalizeCloCode = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    if (/^CLO-\d+$/i.test(trimmed)) return trimmed.toUpperCase();
+    if (/^\d+$/.test(trimmed)) return `CLO-${trimmed}`;
+    return trimmed.toUpperCase();
+  };
+
+  const importWeeklyTopicsFromCsv = async (file: File) => {
+    try {
+      const content = await file.text();
+      const lines = content
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (lines.length < 2) {
+        throw new Error("CSV must include a header row and at least one data row.");
+      }
+
+      const headers = parseCsvLine(lines[0]).map((header) => header.toLowerCase());
+      const getColumnIndex = (columnName: string) => headers.indexOf(columnName.toLowerCase());
+      const weekNoIndex = getColumnIndex("weekNo");
+      const weekDateIndex = getColumnIndex("weekDate");
+      const subjectTitleIndex = getColumnIndex("subjectTitle");
+      const detailsTextIndex = getColumnIndex("detailsText");
+      const tasksPrivateStudyTextIndex = getColumnIndex("tasksPrivateStudyText");
+      const closIndex = getColumnIndex("clos");
+
+      const requiredColumns = [
+        ["weekNo", weekNoIndex],
+        ["subjectTitle", subjectTitleIndex],
+        ["detailsText", detailsTextIndex],
+        ["tasksPrivateStudyText", tasksPrivateStudyTextIndex],
+      ] as const;
+
+      const missingColumns = requiredColumns
+        .filter(([, columnIndex]) => columnIndex < 0)
+        .map(([columnName]) => columnName);
+
+      if (missingColumns.length > 0) {
+        throw new Error(`Missing required CSV columns: ${missingColumns.join(", ")}.`);
+      }
+
+      const importedWeeklyTopics = lines.slice(1).map((line, rowIndex) => {
+        const values = parseCsvLine(line);
+        const weekNo = Number(values[weekNoIndex]);
+        if (!Number.isFinite(weekNo) || weekNo <= 0) {
+          throw new Error(`Invalid weekNo at CSV row ${rowIndex + 2}.`);
+        }
+
+        const subjectTitle = values[subjectTitleIndex] ?? "";
+        const detailsText = values[detailsTextIndex] ?? "";
+        const tasksPrivateStudyText = values[tasksPrivateStudyTextIndex] ?? "";
+        const weekDateRaw = weekDateIndex >= 0 ? (values[weekDateIndex] ?? "") : "";
+        const closRaw = closIndex >= 0 ? (values[closIndex] ?? "") : "";
+
+        const clos = closRaw
+          .split("|")
+          .map((item) => normalizeCloCode(item))
+          .filter(Boolean)
+          .map((cloCode) => ({ cloCode }));
+
+        return {
+          weekNo,
+          weekDate: weekDateRaw || null,
+          subjectTitle,
+          detailsText,
+          tasksPrivateStudyText,
+          clos,
+        };
+      });
+
+      if (importedWeeklyTopics.length === 0) {
+        throw new Error("CSV does not contain any weekly topic rows.");
+      }
+
+      replaceWeeklyTopics(importedWeeklyTopics);
+      form.clearErrors("weeklyTopics");
+    } catch (error) {
+      throw error instanceof Error ? error : new Error("Failed to import weekly topics CSV.");
+    }
+  };
+
+  const handleWeeklyTopicsCsvFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setWeeklyTopicsCsvFile(file);
+    setWeeklyTopicsCsvDialogError(null);
+    form.clearErrors("weeklyTopics");
+  };
+
+  const handleWeeklyTopicsCsvImportSubmit = async () => {
+    if (!weeklyTopicsCsvFile) {
+      setWeeklyTopicsCsvDialogError("Please choose a CSV file before importing.");
+      return;
+    }
+
+    try {
+      await importWeeklyTopicsFromCsv(weeklyTopicsCsvFile);
+      setIsWeeklyTopicsCsvDialogOpen(false);
+      setWeeklyTopicsCsvFile(null);
+      setWeeklyTopicsCsvDialogError(null);
+      if (weeklyTopicsCsvInputRef.current) {
+        weeklyTopicsCsvInputRef.current.value = "";
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to import weekly topics CSV.";
+      setWeeklyTopicsCsvDialogError(message);
+      form.setError("weeklyTopics", {
+        type: "manual",
+        message,
+      });
+    }
+  };
+
   const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
     control: form.control,
     name: "objectives",
@@ -269,7 +431,12 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     control: form.control,
     name: "learningOutcomes",
   });
-  const { fields: weeklyTopicFields, append: appendWeeklyTopic, remove: removeWeeklyTopic } = useFieldArray({
+  const {
+    fields: weeklyTopicFields,
+    append: appendWeeklyTopic,
+    remove: removeWeeklyTopic,
+    replace: replaceWeeklyTopics,
+  } = useFieldArray({
     control: form.control,
     name: "weeklyTopics",
   });
@@ -766,25 +933,41 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-white">Weekly Topics</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  appendWeeklyTopic({
-                    weekNo: weeklyTopicFields.length + 1,
-                    weekDate: null,
-                    subjectTitle: "",
-                    detailsText: "",
-                    tasksPrivateStudyText: "",
-                    clos: [],
-                  })
-                }
-              >
-                <Plus className="mr-1 size-4" />
-                Add Week
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsWeeklyTopicsCsvDialogOpen(true);
+                    setWeeklyTopicsCsvDialogError(null);
+                  }}
+                >
+                  Import CSV
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    appendWeeklyTopic({
+                      weekNo: weeklyTopicFields.length + 1,
+                      weekDate: null,
+                      subjectTitle: "",
+                      detailsText: "",
+                      tasksPrivateStudyText: "",
+                      clos: [],
+                    })
+                  }
+                >
+                  <Plus className="mr-1 size-4" />
+                  Add Week
+                </Button>
+              </div>
             </div>
+            {form.formState.errors.weeklyTopics?.message ? (
+              <p className="text-sm text-red-400">{String(form.formState.errors.weeklyTopics.message)}</p>
+            ) : null}
             {weeklyTopicFields.map((item, index) => (
               <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
                 <div className="grid grid-cols-[120px_200px_1fr_auto] gap-2">
@@ -954,6 +1137,53 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 />
               </div>
             ))}
+            <Dialog open={isWeeklyTopicsCsvDialogOpen} onOpenChange={setIsWeeklyTopicsCsvDialogOpen}>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Import Weekly Topics from CSV</DialogTitle>
+                  <DialogDescription>
+                    Upload a CSV file matching the structure below, then click Submit Import.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-3">
+                  <input
+                    ref={weeklyTopicsCsvInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    onChange={handleWeeklyTopicsCsvFileChange}
+                    className="w-full rounded-md border border-white/10 bg-[#101010] px-3 py-2 text-sm text-white file:mr-3 file:rounded file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-black hover:file:bg-gray-200"
+                  />
+                  <div className="rounded-md border border-white/10 bg-[#101010] p-3">
+                    <p className="text-xs font-medium text-white">CSV Example Structure</p>
+                    <pre className="mt-2 overflow-x-auto rounded border border-white/10 bg-[#0a0a0a] p-2 text-xs text-gray-300">
+                      {`weekNo,weekDate,subjectTitle,detailsText,tasksPrivateStudyText,clos
+1,2026-10-05,Introduction to Systems,"Overview of systems and scope","Read chapter 1",CLO-1|CLO-2
+2,2026-10-12,Architecture Fundamentals,"Core architecture concepts","Prepare summary notes",CLO-2|CLO-3`}
+                    </pre>
+                  </div>
+                  {weeklyTopicsCsvDialogError ? (
+                    <p className="text-sm text-red-400">{weeklyTopicsCsvDialogError}</p>
+                  ) : null}
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsWeeklyTopicsCsvDialogOpen(false);
+                      setWeeklyTopicsCsvDialogError(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="button" onClick={handleWeeklyTopicsCsvImportSubmit}>
+                    Submit Import
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         );
       case "Evaluation":
