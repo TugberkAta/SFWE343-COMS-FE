@@ -603,7 +603,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
           <div className="space-y-4">
             <div className="space-y-3 rounded-md border border-white/10 p-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Objectives</p>
+                <p className="text-sm font-medium text-white">Course Objectives</p>
                 <Button
                   type="button"
                   variant="outline"
@@ -611,7 +611,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   onClick={() => appendObjective({ description: "" })}
                 >
                   <Plus className="mr-1 size-4" />
-                  Add Objective
+                  Add Course Objective
                 </Button>
               </div>
               {objectiveFields.map((item, index) => (
