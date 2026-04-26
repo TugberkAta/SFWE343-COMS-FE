@@ -56,7 +56,7 @@ export type PostCourseOutlineBody = {
   courseId: number;
   termId: number;
   lecturerUserId: number;
-  assistantUserId: number | null;
+  assistantUserIds: number[];
   textbooksText: string;
   additionalReadingText: string;
   createdByUserId: number;

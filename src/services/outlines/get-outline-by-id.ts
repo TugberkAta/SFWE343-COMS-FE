@@ -79,6 +79,7 @@ export type OutlineById = {
   status: "published" | "pending" | "draft";
   lecturerUserId: number;
   assistantUserId: number | null;
+  assistantUserIds?: number[];
   textbooksText: string;
   additionalReadingText: string;
   createdByUserId: number;

@@ -101,81 +101,86 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       })),
     [approvedUsers]
   );
-  const assistantUserOptions = useMemo(
-    () => [{ value: "none", label: "None" }, ...approvedUserOptions],
-    [approvedUserOptions]
-  );
   const existingOutline = outlineData?.outline as OutlineById | undefined;
 
-  const toOutlineFormValues = (outline: OutlineById): PostCourseOutlineBody => ({
-    courseId: outline.courseId,
-    termId: outline.termId,
-    lecturerUserId: outline.lecturerUserId,
-    assistantUserId: outline.assistantUserId,
-    textbooksText: outline.textbooksText || "",
-    additionalReadingText: outline.additionalReadingText || "",
-    createdByUserId: currentUser?.userId ?? outline.createdByUserId ?? 0,
-    objectives: outline.objectives?.length
-      ? outline.objectives.map((item) => ({ description: item.objectiveText || "" }))
-      : [{ description: "" }],
-    contentItems: outline.contentItems?.length
-      ? outline.contentItems.map((item) => ({ description: item.contentText || "" }))
-      : [{ description: "" }],
-    learningOutcomes: outline.learningOutcomes?.length
-      ? outline.learningOutcomes.map((item) => ({
-          cloCode: `CLO-${item.cloNumber}`,
-          description: item.statement || "",
-        }))
-      : [{ cloCode: "CLO-1", description: "" }],
-    weeklyTopics: outline.weeklyTopics?.length
-      ? outline.weeklyTopics.map((item, index) => ({
-          weekNo: item.weekNo || index + 1,
-          weekDate: item.weekDate,
-          subjectTitle: item.subjectTitle || "",
-          detailsText: item.detailsText || "",
-          tasksPrivateStudyText: item.tasksPrivateStudyText || "",
-          clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
-        }))
-      : [
-          {
-            weekNo: 1,
-            weekDate: null,
-            subjectTitle: "",
-            detailsText: "",
-            tasksPrivateStudyText: "",
-            clos: [],
-          },
-        ],
-    policies: outline.policies?.length
-      ? outline.policies.map((item) => ({
-          policyType: item.title || "",
-          description: item.bodyText || "",
-        }))
-      : [{ policyType: "", description: "" }],
-    referenceLinks: outline.referenceLinks?.length
-      ? outline.referenceLinks.map((item) => ({ title: item.label || "", url: item.url || "" }))
-      : [{ title: "", url: "" }],
-    workloadItems: outline.workloadItems?.length
-      ? outline.workloadItems.map((item) => ({
-          activity: item.activityType || "",
-          hours: item.durationHours || 0,
-        }))
-      : [{ activity: "", hours: 0 }],
-    evaluationItems: outline.evaluationItems?.length
-      ? outline.evaluationItems.map((item) => ({
-          title: item.name || "",
-          weight: item.weightPercent || 0,
-          clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
-        }))
-      : [{ title: "", weight: 0, clos: [] }],
-  });
+  const toOutlineFormValues = (outline: OutlineById): PostCourseOutlineBody => {
+    const outlineWithAssistants = outline as OutlineById & { assistantUserIds?: number[] };
+    const normalizedAssistantUserIds = Array.isArray(outlineWithAssistants.assistantUserIds)
+      ? outlineWithAssistants.assistantUserIds
+      : outline.assistantUserId
+        ? [outline.assistantUserId]
+        : [];
+
+    return {
+      courseId: outline.courseId,
+      termId: outline.termId,
+      lecturerUserId: outline.lecturerUserId,
+      assistantUserIds: normalizedAssistantUserIds,
+      textbooksText: outline.textbooksText || "",
+      additionalReadingText: outline.additionalReadingText || "",
+      createdByUserId: currentUser?.userId ?? outline.createdByUserId ?? 0,
+      objectives: outline.objectives?.length
+        ? outline.objectives.map((item) => ({ description: item.objectiveText || "" }))
+        : [{ description: "" }],
+      contentItems: outline.contentItems?.length
+        ? outline.contentItems.map((item) => ({ description: item.contentText || "" }))
+        : [{ description: "" }],
+      learningOutcomes: outline.learningOutcomes?.length
+        ? outline.learningOutcomes.map((item) => ({
+            cloCode: `CLO-${item.cloNumber}`,
+            description: item.statement || "",
+          }))
+        : [{ cloCode: "CLO-1", description: "" }],
+      weeklyTopics: outline.weeklyTopics?.length
+        ? outline.weeklyTopics.map((item, index) => ({
+            weekNo: item.weekNo || index + 1,
+            weekDate: item.weekDate,
+            subjectTitle: item.subjectTitle || "",
+            detailsText: item.detailsText || "",
+            tasksPrivateStudyText: item.tasksPrivateStudyText || "",
+            clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
+          }))
+        : [
+            {
+              weekNo: 1,
+              weekDate: null,
+              subjectTitle: "",
+              detailsText: "",
+              tasksPrivateStudyText: "",
+              clos: [],
+            },
+          ],
+      policies: outline.policies?.length
+        ? outline.policies.map((item) => ({
+            policyType: item.title || "",
+            description: item.bodyText || "",
+          }))
+        : [{ policyType: "", description: "" }],
+      referenceLinks: outline.referenceLinks?.length
+        ? outline.referenceLinks.map((item) => ({ title: item.label || "", url: item.url || "" }))
+        : [{ title: "", url: "" }],
+      workloadItems: outline.workloadItems?.length
+        ? outline.workloadItems.map((item) => ({
+            activity: item.activityType || "",
+            hours: item.durationHours || 0,
+          }))
+        : [{ activity: "", hours: 0 }],
+      evaluationItems: outline.evaluationItems?.length
+        ? outline.evaluationItems.map((item) => ({
+            title: item.name || "",
+            weight: item.weightPercent || 0,
+            clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
+          }))
+        : [{ title: "", weight: 0, clos: [] }],
+    };
+  };
 
   const form = useForm<PostCourseOutlineBody>({
     defaultValues: {
       courseId,
       termId: 0,
       lecturerUserId: 0,
-      assistantUserId: null,
+      assistantUserIds: [],
       textbooksText: "",
       additionalReadingText: "",
       createdByUserId: currentUser?.userId ?? 0,
@@ -333,8 +338,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     if (isUpdateMode && outlineId) {
       const patchPayload: PatchCourseOutlineBody = {
         lecturerUserId: values.lecturerUserId,
-        assistantUserId: values.assistantUserId,
-        termId: values.termId,
+        assistantUserIds: values.assistantUserIds,
         textbooksText: values.textbooksText,
         additionalReadingText: values.additionalReadingText,
         objectives: values.objectives,
@@ -441,19 +445,25 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
             />
             <FormField
               control={form.control}
-              name="assistantUserId"
+              name="assistantUserIds"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Assistant</FormLabel>
+                  <FormLabel>Assistants</FormLabel>
                   <FormControl>
                     <Combobox
-                      items={assistantUserOptions}
-                      value={assistantUserOptions.find((option) =>
-                        option.value === (field.value ? String(field.value) : "none")
+                      multiple
+                      items={approvedUserOptions}
+                      value={approvedUserOptions.filter((option) =>
+                        field.value.includes(Number(option.value))
                       )}
-                      onValueChange={(value) =>
-                        field.onChange(!value || value.value === "none" ? null : Number(value.value))
-                      }
+                      onValueChange={(value) => {
+                        const selectedValues = Array.isArray(value) ? value : [];
+                        const normalizedAssistantIds = selectedValues
+                          .map((item) => (typeof item === "string" ? Number(item) : Number(item.value)))
+                          .filter((id) => Number.isFinite(id) && id > 0);
+
+                        field.onChange(normalizedAssistantIds);
+                      }}
                       disabled={loadingUsers || approvedUserOptions.length === 0}
                     >
                       <ComboboxTrigger
@@ -464,15 +474,20 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                             className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
                           >
                             <span className="truncate">
-                              {assistantUserOptions.find(
-                                (option) => option.value === (field.value ? String(field.value) : "none")
-                              )?.label ?? (loadingUsers ? "Loading users..." : "Select assistant (optional)")}
+                              {field.value.length > 0
+                                ? approvedUserOptions
+                                    .filter((option) => field.value.includes(Number(option.value)))
+                                    .map((option) => option.label)
+                                    .join(", ")
+                                : loadingUsers
+                                  ? "Loading users..."
+                                  : "Select assistants (optional)"}
                             </span>
                           </Button>
                         }
                       />
                       <ComboboxContent>
-                        <ComboboxInput showTrigger={false} placeholder="Search assistant..." />
+                        <ComboboxInput showTrigger={false} placeholder="Search assistants..." />
                         <ComboboxEmpty>No users found.</ComboboxEmpty>
                         <ComboboxList>
                           {(item) => (
@@ -1204,11 +1219,16 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
           const selectedLecturerLabel =
             approvedUserOptions.find((option) => option.value === String(values.lecturerUserId))?.label ??
             `User #${values.lecturerUserId}`;
-          const selectedAssistantLabel =
-            values.assistantUserId === null
+          const selectedAssistantLabels =
+            values.assistantUserIds.length === 0
               ? "None"
-              : approvedUserOptions.find((option) => option.value === String(values.assistantUserId))?.label ??
-                `User #${values.assistantUserId}`;
+              : values.assistantUserIds
+                  .map(
+                    (assistantUserId) =>
+                      approvedUserOptions.find((option) => option.value === String(assistantUserId))?.label ??
+                      `User #${assistantUserId}`
+                  )
+                  .join(", ");
 
         return (
           <div className="space-y-4 text-sm text-gray-300">
@@ -1226,7 +1246,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   <p><span className="text-gray-400">Course ID:</span> {values.courseId}</p>
                   <p><span className="text-gray-400">Term:</span> {selectedTermLabel}</p>
                   <p><span className="text-gray-400">Lecturer:</span> {selectedLecturerLabel}</p>
-                  <p><span className="text-gray-400">Assistant:</span> {selectedAssistantLabel}</p>
+                  <p><span className="text-gray-400">Assistants:</span> {selectedAssistantLabels}</p>
                 </div>
               </div>
 

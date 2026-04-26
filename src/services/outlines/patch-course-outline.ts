@@ -5,8 +5,7 @@ import type { PostCourseOutlineBody } from "./post-course-outline";
 export type PatchCourseOutlineBody = Pick<
   PostCourseOutlineBody,
   | "lecturerUserId"
-  | "assistantUserId"
-  | "termId"
+  | "assistantUserIds"
   | "textbooksText"
   | "additionalReadingText"
   | "objectives"
