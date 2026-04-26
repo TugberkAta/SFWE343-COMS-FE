@@ -12,8 +12,6 @@ export type PatchCourseOutlineBody = Pick<
   | "contentItems"
   | "learningOutcomes"
   | "weeklyTopics"
-  | "policies"
-  | "referenceLinks"
   | "workloadItems"
   | "evaluationItems"
 > & {

@@ -51,7 +51,7 @@ const tabNames = [
   "Weekly Plan",
   "Evaluation",
   "Schedule",
-  "Policies & Resources",
+  "Resources",
   "Review & Publish",
 ] as const;
 
@@ -172,15 +172,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               clos: [],
             },
           ],
-      policies: outline.policies?.length
-        ? outline.policies.map((item) => ({
-            policyType: item.title || "",
-            description: item.bodyText || "",
-          }))
-        : [{ policyType: "", description: "" }],
-      referenceLinks: outline.referenceLinks?.length
-        ? outline.referenceLinks.map((item) => ({ title: item.label || "", url: item.url || "" }))
-        : [{ title: "", url: "" }],
       workloadItems: outline.workloadItems?.length
         ? outline.workloadItems.map((item) => ({
             activity: item.activityType || "",
@@ -222,8 +213,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
           clos: [],
         },
       ],
-      policies: [{ policyType: "", description: "" }],
-      referenceLinks: [{ title: "", url: "" }],
       workloadItems: [{ activity: "", hours: 0 }],
       evaluationItems: [{ title: "", weight: 0, clos: [] }],
     },
@@ -295,18 +284,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
   const { fields: workloadItemFields, append: appendWorkloadItem, remove: removeWorkloadItem } = useFieldArray({
     control: form.control,
     name: "workloadItems",
-  });
-  const { fields: policyFields, append: appendPolicy, remove: removePolicy } = useFieldArray({
-    control: form.control,
-    name: "policies",
-  });
-  const {
-    fields: referenceLinkFields,
-    append: appendReferenceLink,
-    remove: removeReferenceLink,
-  } = useFieldArray({
-    control: form.control,
-    name: "referenceLinks",
   });
 
   useEffect(() => {
@@ -383,11 +360,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       ],
       Evaluation: ["evaluationItems.0.title", "evaluationItems.0.weight", "evaluationItems.0.clos"],
       Schedule: ["workloadItems.0.activity", "workloadItems.0.hours"],
-      "Policies & Resources": [
-        "policies.0.policyType",
-        "policies.0.description",
-        "referenceLinks.0.title",
-        "referenceLinks.0.url",
+      Resources: [
         "textbooksText",
         "additionalReadingText",
       ],
@@ -464,8 +437,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         contentItems: values.contentItems,
         learningOutcomes: values.learningOutcomes,
         weeklyTopics: values.weeklyTopics,
-        policies: values.policies,
-        referenceLinks: values.referenceLinks,
         workloadItems: values.workloadItems,
         evaluationItems: values.evaluationItems,
       };
@@ -1188,129 +1159,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
             ))}
           </div>
         );
-      case "Policies & Resources":
+      case "Resources":
         return (
           <div className="space-y-4">
-            <div className="space-y-3 rounded-md border border-white/10 p-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Policies</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => appendPolicy({ policyType: "", description: "" })}
-                >
-                  <Plus className="mr-1 size-4" />
-                  Add Policy
-                </Button>
-              </div>
-              {policyFields.map((item, index) => (
-                <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
-                  <div className="flex items-start gap-2">
-                    <FormField
-                      control={form.control}
-                      name={`policies.${index}.policyType`}
-                      rules={{ required: "Policy type is required" }}
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel required>Policy Type</FormLabel>
-                          <FormControl>
-                            <Input {...field} className={inputClassName} placeholder="Attendance" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="self-start mt-6"
-                      disabled={policyFields.length === 1}
-                      onClick={() => removePolicy(index)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name={`policies.${index}.description`}
-                    rules={{ required: "Policy details are required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>Description</FormLabel>
-                        <FormControl>
-                          <RichTextEditor
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            placeholder="Attendance, grading, conduct policies..."
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="space-y-3 rounded-md border border-white/10 p-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Reference Links</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => appendReferenceLink({ title: "", url: "" })}
-                >
-                  <Plus className="mr-1 size-4" />
-                  Add Reference
-                </Button>
-              </div>
-              {referenceLinkFields.map((item, index) => (
-                <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
-                  <div className="flex items-start gap-2">
-                    <FormField
-                      control={form.control}
-                      name={`referenceLinks.${index}.title`}
-                      rules={{ required: "Reference title is required" }}
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel required>Title</FormLabel>
-                          <FormControl>
-                            <Input {...field} className={inputClassName} placeholder="Course website" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="self-start mt-6"
-                      disabled={referenceLinkFields.length === 1}
-                      onClick={() => removeReferenceLink(index)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name={`referenceLinks.${index}.url`}
-                    rules={{ required: "Reference link is required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>URL</FormLabel>
-                        <FormControl>
-                          <Input {...field} className={inputClassName} placeholder="https://example.com/resource" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              ))}
-            </div>
             <FormField
               control={form.control}
               name="textbooksText"
@@ -1469,18 +1320,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Policies</p>
-                <ul className="list-disc space-y-1 pl-4">
-                  {values.policies.map((policy, index) => (
-                    <li key={`policy-${index}`}>
-                      <span className="text-gray-400">{policy.policyType || "Policy"}:</span>{" "}
-                      {renderRichText(policy.description)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
                 <p className="mb-3 text-sm font-semibold text-white">Resources</p>
                 <div className="space-y-2">
                   <div>
@@ -1489,16 +1328,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   <div>
                     <span className="text-gray-400">Additional Reading:</span>{" "}
                     {renderRichText(values.additionalReadingText)}
-                  </div>
-                  <div>
-                    <p className="text-gray-400">Reference Links:</p>
-                    <ul className="mt-1 list-disc space-y-1 pl-4">
-                      {values.referenceLinks.map((link, index) => (
-                        <li key={`reference-${index}`}>
-                          {link.title || "Untitled"} - {link.url || "-"}
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
               </div>

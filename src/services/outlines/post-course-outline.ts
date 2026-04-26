@@ -27,16 +27,6 @@ type OutlineWeeklyTopicPayload = {
   clos: OutlineWeeklyTopicCloPayload[];
 };
 
-type OutlinePolicyPayload = {
-  policyType: string;
-  description: string;
-};
-
-type OutlineReferenceLinkPayload = {
-  title: string;
-  url: string;
-};
-
 type OutlineWorkloadItemPayload = {
   activity: string;
   hours: number;
@@ -64,8 +54,6 @@ export type PostCourseOutlineBody = {
   contentItems: OutlineContentItemPayload[];
   learningOutcomes: OutlineLearningOutcomePayload[];
   weeklyTopics: OutlineWeeklyTopicPayload[];
-  policies: OutlinePolicyPayload[];
-  referenceLinks: OutlineReferenceLinkPayload[];
   workloadItems: OutlineWorkloadItemPayload[];
   evaluationItems: OutlineEvaluationItemPayload[];
 };
