@@ -163,15 +163,17 @@ export default function TeacherOutlinesPage() {
                     >
                       <Eye size={16} />
                     </Button>
-                    <CreateOutlineDialog
-                      courseId={item.courseId}
-                      outlineId={item.outlineId}
-                      trigger={
-                        <Button size="icon" variant="ghost">
-                          <Pencil size={16} />
-                        </Button>
-                      }
-                    />
+                    {item.status !== "published" ? (
+                      <CreateOutlineDialog
+                        courseId={item.courseId}
+                        outlineId={item.outlineId}
+                        trigger={
+                          <Button size="icon" variant="ghost">
+                            <Pencil size={16} />
+                          </Button>
+                        }
+                      />
+                    ) : null}
                     <Button
                       size="icon"
                       variant="ghost"

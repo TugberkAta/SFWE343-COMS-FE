@@ -7,8 +7,15 @@ import { getOutlineById } from "@/services/outlines";
 import type { OutlineById, OutlineContentItem, OutlineObjective, OutlineWeeklyTopic } from "@/services/outlines/get-outline-by-id";
 
 const keyValueClassName = "text-sm text-white/80";
+const richTextClassName =
+  "text-sm text-white/80 [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1";
 
 const renderEmpty = (value?: string | null) => value && value.trim() ? value : "-";
+const renderRichText = (value?: string | null) => {
+  const safeValue = value && value.trim() ? value : "<p>-</p>";
+
+  return <div className={richTextClassName} dangerouslySetInnerHTML={{ __html: safeValue }} />;
+};
 
 export default function TeacherOutlineDetailsPage() {
   const navigate = useNavigate();
@@ -70,28 +77,29 @@ export default function TeacherOutlineDetailsPage() {
         <CardContent className="space-y-4">
           <div>
             <h3 className="text-sm font-medium text-white/90">Objectives</h3>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-white/80">
+            <ul className="mt-2 space-y-2">
               {(outline.objectives || []).map((item: OutlineObjective) => (
-                <li key={item.objectiveId}>{renderEmpty(item.objectiveText)}</li>
+                <li key={item.objectiveId}>{renderRichText(item.objectiveText)}</li>
               ))}
             </ul>
           </div>
 
           <div>
             <h3 className="text-sm font-medium text-white/90">Content Items</h3>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-white/80">
+            <ul className="mt-2 space-y-2">
               {(outline.contentItems || []).map((item: OutlineContentItem) => (
-                <li key={item.contentItemId}>{renderEmpty(item.contentText)}</li>
+                <li key={item.contentItemId}>{renderRichText(item.contentText)}</li>
               ))}
             </ul>
           </div>
 
           <div>
             <h3 className="text-sm font-medium text-white/90">Learning Outcomes</h3>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-white/80">
+            <ul className="mt-2 space-y-2">
               {sortedLearningOutcomes.map((item) => (
                 <li key={item.cloId}>
-                  CLO-{item.cloNumber}: {renderEmpty(item.statement)}
+                  <span className="text-sm text-white/80">CLO-{item.cloNumber}:</span>
+                  {renderRichText(item.statement)}
                 </li>
               ))}
             </ul>
@@ -109,10 +117,14 @@ export default function TeacherOutlineDetailsPage() {
               <p className="text-sm font-medium">
                 Week {topic.weekNo}: {renderEmpty(topic.subjectTitle)}
               </p>
-              <p className="mt-1 text-sm text-white/75">Details: {renderEmpty(topic.detailsText)}</p>
-              <p className="mt-1 text-sm text-white/75">
-                Private Study: {renderEmpty(topic.tasksPrivateStudyText)}
-              </p>
+              <div className="mt-1 text-sm text-white/75">
+                <span>Details:</span>
+                {renderRichText(topic.detailsText)}
+              </div>
+              <div className="mt-1 text-sm text-white/75">
+                <span>Private Study:</span>
+                {renderRichText(topic.tasksPrivateStudyText)}
+              </div>
               <p className="mt-1 text-sm text-white/75">
                 CLOs: {(topic.clos || []).length ? topic.clos.map((clo) => `CLO-${clo.cloNumber}`).join(", ") : "-"}
               </p>
