@@ -71,6 +71,12 @@ export type OutlineEvaluationItem = {
   clos: OutlineEvaluationItemClo[];
 };
 
+export type ProgramLearningOutcome = {
+  ploId: number;
+  ploNumber: number;
+  statement: string;
+};
+
 export type OutlineById = {
   outlineId: number;
   courseId: number;
@@ -82,6 +88,8 @@ export type OutlineById = {
   assistantUserIds?: number[];
   textbooksText: string;
   additionalReadingText: string;
+  officeHours: string;
+  officeCode: string;
   createdByUserId: number;
   createdAt: string;
   updatedAt: string;
@@ -105,6 +113,7 @@ export type OutlineById = {
   referenceLinks: OutlineReferenceLink[];
   workloadItems: OutlineWorkloadItem[];
   prerequisiteCourseCodes: string[];
+  programLearningOutcomes: ProgramLearningOutcome[];
   evaluationItems: OutlineEvaluationItem[];
 };
 

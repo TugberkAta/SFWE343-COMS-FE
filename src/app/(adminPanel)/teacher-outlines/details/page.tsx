@@ -41,6 +41,8 @@ export default function TeacherOutlineDetailsPage() {
 
   const sortedLearningOutcomes =
     [...(outline.learningOutcomes || [])].sort((a, b) => Number(a.cloNumber) - Number(b.cloNumber));
+  const sortedProgramLearningOutcomes =
+    [...(outline.programLearningOutcomes || [])].sort((a, b) => Number(a.ploNumber) - Number(b.ploNumber));
 
   return (
     <div className="space-y-6 p-6 text-white">
@@ -104,6 +106,18 @@ export default function TeacherOutlineDetailsPage() {
               ))}
             </ul>
           </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-white/90">Program Learning Outcomes</h3>
+            <ul className="mt-2 space-y-2">
+              {sortedProgramLearningOutcomes.map((item) => (
+                <li key={item.ploId}>
+                  <span className="text-sm text-white/80">PLO-{item.ploNumber}:</span>
+                  {renderRichText(item.statement)}
+                </li>
+              ))}
+            </ul>
+          </div>
         </CardContent>
       </Card>
 
@@ -130,6 +144,24 @@ export default function TeacherOutlineDetailsPage() {
               </p>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card className="border-white/10 bg-[#141414]">
+        <CardHeader>
+          <CardTitle>Resources</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="text-sm font-medium text-white/90">Textbooks</h3>
+            {renderRichText(outline.textbooksText)}
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-white/90">Additional Reading</h3>
+            {renderRichText(outline.additionalReadingText)}
+          </div>
+          <p className={keyValueClassName}>Office Hours: {renderEmpty(outline.officeHours)}</p>
+          <p className={keyValueClassName}>Office Code: {renderEmpty(outline.officeCode)}</p>
         </CardContent>
       </Card>
     </div>

@@ -56,6 +56,7 @@ const tabNames = [
   "Basic Info",
   "Content & Objectives",
   "Learning Outcomes (CLOs)",
+  "Program Learning Outcomes (PLOs)",
   "Weekly Plan",
   "Evaluation",
   "Schedule",
@@ -139,6 +140,8 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       assistantUserIds: normalizedAssistantUserIds,
       textbooksText: outline.textbooksText || "",
       additionalReadingText: outline.additionalReadingText || "",
+      officeHours: outline.officeHours || "",
+      officeCode: outline.officeCode || "",
       createdByUserId: currentUser?.userId ?? outline.createdByUserId ?? 0,
       objectives: outline.objectives?.length
         ? outline.objectives.map((item) => ({ description: item.objectiveText || "" }))
@@ -165,6 +168,12 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 })
               ),
             ],
+      programLearningOutcomes: outline.programLearningOutcomes?.length
+        ? outline.programLearningOutcomes.map((item) => ({
+            ploCode: `PLO-${item.ploNumber}`,
+            description: item.statement || "",
+          }))
+        : [{ ploCode: "PLO-1", description: "" }],
       weeklyTopics: outline.weeklyTopics?.length
         ? outline.weeklyTopics.map((item, index) => ({
             weekNo: item.weekNo || index + 1,
@@ -208,6 +217,8 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       assistantUserIds: [],
       textbooksText: "",
       additionalReadingText: "",
+      officeHours: "",
+      officeCode: "",
       createdByUserId: currentUser?.userId ?? 0,
       objectives: [{ description: "" }],
       contentItems: [{ description: "" }],
@@ -215,6 +226,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         cloCode: `CLO-${index + 1}`,
         description: "",
       })),
+      programLearningOutcomes: [{ ploCode: "PLO-1", description: "" }],
       weeklyTopics: [
         {
           weekNo: 1,
@@ -432,6 +444,14 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     name: "learningOutcomes",
   });
   const {
+    fields: programLearningOutcomeFields,
+    append: appendProgramLearningOutcome,
+    remove: removeProgramLearningOutcome,
+  } = useFieldArray({
+    control: form.control,
+    name: "programLearningOutcomes",
+  });
+  const {
     fields: weeklyTopicFields,
     append: appendWeeklyTopic,
     remove: removeWeeklyTopic,
@@ -478,6 +498,15 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
   }, [form, learningOutcomeFields]);
 
   useEffect(() => {
+    programLearningOutcomeFields.forEach((_, index) => {
+      form.setValue(`programLearningOutcomes.${index}.ploCode`, `PLO-${index + 1}`, {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
+    });
+  }, [form, programLearningOutcomeFields]);
+
+  useEffect(() => {
     if (learningOutcomeFields.length >= MIN_CLO_COUNT) {
       form.clearErrors("learningOutcomes");
     }
@@ -518,6 +547,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       ],
       "Content & Objectives": ["objectives.0.description", "contentItems.0.description"],
       "Learning Outcomes (CLOs)": ["learningOutcomes.0.cloCode", "learningOutcomes.0.description"],
+      "Program Learning Outcomes (PLOs)": [
+        "programLearningOutcomes.0.ploCode",
+        "programLearningOutcomes.0.description",
+      ],
       "Weekly Plan": [
         "weeklyTopics.0.weekNo",
         "weeklyTopics.0.subjectTitle",
@@ -600,9 +633,12 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         assistantUserIds: values.assistantUserIds,
         textbooksText: values.textbooksText,
         additionalReadingText: values.additionalReadingText,
+        officeHours: values.officeHours,
+        officeCode: values.officeCode,
         objectives: values.objectives,
         contentItems: values.contentItems,
         learningOutcomes: values.learningOutcomes,
+        programLearningOutcomes: values.programLearningOutcomes,
         weeklyTopics: values.weeklyTopics,
         workloadItems: values.workloadItems,
         evaluationItems: values.evaluationItems,
@@ -920,6 +956,71 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     className="self-start mt-6"
                     disabled={learningOutcomeFields.length <= MIN_CLO_COUNT}
                     onClick={() => removeLearningOutcome(index)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      case "Program Learning Outcomes (PLOs)":
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-white">Program Learning Outcomes</p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => appendProgramLearningOutcome({ ploCode: "", description: "" })}
+              >
+                <Plus className="mr-1 size-4" />
+                Add PLO
+              </Button>
+            </div>
+            {programLearningOutcomeFields.map((item, index) => (
+              <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
+                <div className="grid grid-cols-[180px_1fr_auto] gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`programLearningOutcomes.${index}.ploCode`}
+                    rules={{ required: "PLO code is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>PLO Code</FormLabel>
+                        <FormControl>
+                          <Input {...field} className={inputClassName} disabled />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`programLearningOutcomes.${index}.description`}
+                    rules={{ required: "Program learning outcome description is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Description</FormLabel>
+                        <FormControl>
+                          <RichTextEditor
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            placeholder="Write PLO statement..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="self-start mt-6"
+                    disabled={programLearningOutcomeFields.length === 1}
+                    onClick={() => removeProgramLearningOutcome(index)}
                   >
                     <Trash2 className="size-4" />
                   </Button>
@@ -1427,6 +1528,42 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="officeHours"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Office Hours</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="e.g. Mon 10:00-12:00"
+                      className={inputClassName}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="officeCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Office Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="e.g. B-204"
+                      className={inputClassName}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         );
       case "Review & Publish":
@@ -1474,6 +1611,18 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   {values.learningOutcomes.map((outcome) => (
                     <div key={outcome.cloCode}>
                       <span className="text-gray-400">{outcome.cloCode}:</span>
+                      {renderRichText(outcome.description)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
+                <p className="mb-3 text-sm font-semibold text-white">Program Learning Outcomes (PLOs)</p>
+                <div className="space-y-2">
+                  {values.programLearningOutcomes.map((outcome) => (
+                    <div key={outcome.ploCode}>
+                      <span className="text-gray-400">{outcome.ploCode}:</span>
                       {renderRichText(outcome.description)}
                     </div>
                   ))}
@@ -1559,6 +1708,8 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     <span className="text-gray-400">Additional Reading:</span>{" "}
                     {renderRichText(values.additionalReadingText)}
                   </div>
+                  <p><span className="text-gray-400">Office Hours:</span> {values.officeHours || "-"}</p>
+                  <p><span className="text-gray-400">Office Code:</span> {values.officeCode || "-"}</p>
                 </div>
               </div>
             </div>

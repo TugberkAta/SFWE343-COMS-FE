@@ -14,6 +14,11 @@ type OutlineLearningOutcomePayload = {
   description: string;
 };
 
+type OutlineProgramLearningOutcomePayload = {
+  ploCode: string;
+  description: string;
+};
+
 type OutlineWeeklyTopicCloPayload = {
   cloCode: string;
 };
@@ -49,10 +54,13 @@ export type PostCourseOutlineBody = {
   assistantUserIds: number[];
   textbooksText: string;
   additionalReadingText: string;
+  officeHours: string;
+  officeCode: string;
   createdByUserId: number;
   objectives: OutlineObjectivePayload[];
   contentItems: OutlineContentItemPayload[];
   learningOutcomes: OutlineLearningOutcomePayload[];
+  programLearningOutcomes: OutlineProgramLearningOutcomePayload[];
   weeklyTopics: OutlineWeeklyTopicPayload[];
   workloadItems: OutlineWorkloadItemPayload[];
   evaluationItems: OutlineEvaluationItemPayload[];
