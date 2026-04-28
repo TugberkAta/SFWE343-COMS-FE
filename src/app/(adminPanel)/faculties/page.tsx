@@ -23,7 +23,7 @@ const FacultiesPage = () => {
   const [loading, error, data] =
     useFetchData(getDepartments);
 
-  const departments: Department[] = data.departments || [];
+  const departments: Department[] = data?.departments || [];
   const normalizedSearch = search.trim().toLowerCase();
 
   const filteredDepartments = useMemo(

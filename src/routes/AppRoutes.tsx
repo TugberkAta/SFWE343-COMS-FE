@@ -6,6 +6,7 @@ import LoginPage from "@/app/(auth)/login/page";
 import { Navigate, Route, Routes } from "react-router-dom";
 import PendingUsersPage from "@/app/(adminPanel)/pending-users/page";
 import UsersWithRolePage from "@/app/(adminPanel)/users-with-role/page";
+import UserTypesPage from "@/app/(adminPanel)/user-types/page";
 import TeacherOutlinesPage from "@/app/(adminPanel)/teacher-outlines/page";
 import FacultiesPage from "@/app/(adminPanel)/faculties/page";
 import ProgramsPage from "@/app/(adminPanel)/programs/page";
@@ -33,6 +34,7 @@ export const AppRoutes = () => {
         <Route path="programs" element={<ProgramsPage />} />
         <Route path="courses" element={<CoursesPage />} />
         <Route path="pending-users" element={<PendingUsersPage />} />
+        <Route path="user-types" element={<UserTypesPage />} />
         <Route path="users-with-role" element={<UsersWithRolePage />} />
         <Route path="settings/account" element={<SettingsAccountPage />} />
       </Route>

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Pencil, Trash2, Download } from "lucide-react";
+import PermissionGate from "@/components/ui/permission-gate";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import useFetchData from "@/hooks/use-fetch-data";
@@ -174,29 +175,33 @@ export default function TeacherOutlinesPage() {
                         }
                       />
                     ) : null}
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() =>
-                        setOutlinePendingDelete({
-                          outlineId: item.outlineId,
-                          courseCode: item.courseCode,
-                        })
-                      }
-                      disabled={deletingOutlineId === item.outlineId}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() =>
-                        handleDownloadOutline(item.outlineId, item.courseCode)
-                      }
-                      disabled={downloadingOutlineId === item.outlineId}
-                    >
-                      <Download size={16} />
-                    </Button>
+                    <PermissionGate permission="outlines.delete" mode="hide">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() =>
+                          setOutlinePendingDelete({
+                            outlineId: item.outlineId,
+                            courseCode: item.courseCode,
+                          })
+                        }
+                        disabled={deletingOutlineId === item.outlineId}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </PermissionGate>
+                    <PermissionGate permission="outlines.download" mode="hide">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() =>
+                          handleDownloadOutline(item.outlineId, item.courseCode)
+                        }
+                        disabled={downloadingOutlineId === item.outlineId}
+                      >
+                        <Download size={16} />
+                      </Button>
+                    </PermissionGate>
                   </TableCell>
                 </TableRow>
               ))}

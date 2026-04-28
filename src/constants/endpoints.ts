@@ -2,6 +2,7 @@ const user = {
   emailSignup: () => `/email-auth`,
   login: () => `/login`,
   register: () => `/register`,
+  me: () => `/me`,
 };
 
 const users = {
