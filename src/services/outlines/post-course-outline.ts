@@ -43,6 +43,7 @@ type OutlineEvaluationItemCloPayload = {
 
 type OutlineEvaluationItemPayload = {
   title: string;
+  count: number;
   weight: number;
   clos: OutlineEvaluationItemCloPayload[];
 };

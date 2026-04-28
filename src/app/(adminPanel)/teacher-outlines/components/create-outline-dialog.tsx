@@ -202,10 +202,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       evaluationItems: outline.evaluationItems?.length
         ? outline.evaluationItems.map((item) => ({
             title: item.name || "",
+            count: item.count || 1,
             weight: item.weightPercent || 0,
             clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
           }))
-        : [{ title: "", weight: 0, clos: [] }],
+        : [{ title: "", count: 1, weight: 0, clos: [] }],
     };
   };
 
@@ -238,7 +239,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         },
       ],
       workloadItems: [{ activity: "", hours: 0 }],
-      evaluationItems: [{ title: "", weight: 0, clos: [] }],
+      evaluationItems: [{ title: "", count: 1, weight: 0, clos: [] }],
     },
   });
 
@@ -558,7 +559,12 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         "weeklyTopics.0.tasksPrivateStudyText",
         "weeklyTopics.0.clos",
       ],
-      Evaluation: ["evaluationItems.0.title", "evaluationItems.0.weight", "evaluationItems.0.clos"],
+      Evaluation: [
+        "evaluationItems.0.title",
+        "evaluationItems.0.count",
+        "evaluationItems.0.weight",
+        "evaluationItems.0.clos",
+      ],
       Schedule: ["workloadItems.0.activity", "workloadItems.0.hours"],
       Resources: [
         "textbooksText",
@@ -1296,7 +1302,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => appendEvaluationItem({ title: "", weight: 0, clos: [] })}
+                onClick={() => appendEvaluationItem({ title: "", count: 1, weight: 0, clos: [] })}
               >
                 <Plus className="mr-1 size-4" />
                 Add Evaluation
@@ -1309,7 +1315,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
             ) : null}
             {evaluationItemFields.map((item, index) => (
               <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
-                <div className="grid grid-cols-[1fr_160px_auto] gap-2">
+                <div className="grid grid-cols-[1fr_140px_140px_auto] gap-2">
                   <FormField
                     control={form.control}
                     name={`evaluationItems.${index}.title`}
@@ -1319,6 +1325,26 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                         <FormLabel required>Title</FormLabel>
                         <FormControl>
                           <Input {...field} className={inputClassName} placeholder="Midterm Exam" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`evaluationItems.${index}.count`}
+                    rules={{ required: "Count is required", min: 1 }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Count</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            value={field.value}
+                            onChange={(event) => field.onChange(Number(event.target.value))}
+                            className={inputClassName}
+                            min={1}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1677,7 +1703,12 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 <div className="space-y-3">
                   {values.evaluationItems.map((item, index) => (
                     <div key={`assessment-${index}`} className="rounded border border-white/10 p-3">
-                      <p><span className="text-gray-400">{item.title || "Untitled"}:</span> {item.weight}%</p>
+                      <p>
+                        <span className="text-gray-400">{item.title || "Untitled"}:</span> {item.weight}%
+                      </p>
+                      <p className="mt-1">
+                        <span className="text-gray-400">Count:</span> {item.count || 0}
+                      </p>
                       <p className="mt-1">
                         <span className="text-gray-400">Related CLOs:</span>{" "}
                         {item.clos.length > 0 ? item.clos.map((clo) => clo.cloCode).join(", ") : "-"}

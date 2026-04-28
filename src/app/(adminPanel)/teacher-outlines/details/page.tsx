@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetchData from "@/hooks/use-fetch-data";
 import { getOutlineById } from "@/services/outlines";
-import type { OutlineById, OutlineContentItem, OutlineObjective, OutlineWeeklyTopic } from "@/services/outlines/get-outline-by-id";
+import type {
+  OutlineById,
+  OutlineContentItem,
+  OutlineEvaluationItem,
+  OutlineObjective,
+  OutlineWeeklyTopic,
+} from "@/services/outlines/get-outline-by-id";
 
 const keyValueClassName = "text-sm text-white/80";
 const richTextClassName =
@@ -162,6 +168,24 @@ export default function TeacherOutlineDetailsPage() {
           </div>
           <p className={keyValueClassName}>Office Hours: {renderEmpty(outline.officeHours)}</p>
           <p className={keyValueClassName}>Office Code: {renderEmpty(outline.officeCode)}</p>
+        </CardContent>
+      </Card>
+
+      <Card className="border-white/10 bg-[#141414]">
+        <CardHeader>
+          <CardTitle>Evaluation</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {(outline.evaluationItems || []).map((item: OutlineEvaluationItem) => (
+            <div key={item.evaluationItemId} className="rounded-md border border-white/10 p-3">
+              <p className="text-sm font-medium">{renderEmpty(item.name)}</p>
+              <p className={keyValueClassName}>Weight: {item.weightPercent}%</p>
+              <p className={keyValueClassName}>Count: {item.count}</p>
+              <p className={keyValueClassName}>
+                CLOs: {(item.clos || []).length ? item.clos.map((clo) => `CLO-${clo.cloNumber}`).join(", ") : "-"}
+              </p>
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>

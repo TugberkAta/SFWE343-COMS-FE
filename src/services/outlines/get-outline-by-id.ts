@@ -66,6 +66,7 @@ export type OutlineEvaluationItem = {
   itemOrder: number;
   name: string;
   category: string;
+  count: number;
   weightPercent: number;
   notes: string;
   clos: OutlineEvaluationItemClo[];
