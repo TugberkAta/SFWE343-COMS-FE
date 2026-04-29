@@ -31,6 +31,8 @@ import {
 import postApproveUser from "@/services/users/post-approve-user"
 import type { UserRoleRecord } from "@/types/user-role"
 import type { UserWithNoRole } from "@/types/user-with-no-role"
+import { PermissionGate } from "@/components/PermissionGate"
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
 
 const approveFormSchema = z.object({
   userRoleId: z.number().int().positive(),
@@ -81,12 +83,14 @@ export function ApproveUserDialog({
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (!user) return
+
     try {
       await postApproveUser({
         userId: user.userId,
         userRoleId: values.userRoleId,
         approvedStatus: true,
       })
+
       await onApproved()
     } catch (error) {
       console.error("Approve error:", error)
@@ -119,6 +123,7 @@ export function ApproveUserDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
+
                   {rolesLoading ? (
                     <p className="text-sm text-muted-foreground">
                       Loading roles…
@@ -142,6 +147,7 @@ export function ApproveUserDialog({
                           <SelectValue placeholder="Select a role" />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent>
                         {roles.map((role) => (
                           <SelectItem
@@ -154,6 +160,7 @@ export function ApproveUserDialog({
                       </SelectContent>
                     </Select>
                   )}
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -168,14 +175,15 @@ export function ApproveUserDialog({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={
-                  form.formState.isSubmitting || !canSubmit
-                }
-              >
-                {form.formState.isSubmitting ? "Submitting..." : "Confirm"}
-              </Button>
+
+              <PermissionGate permission={ENDPOINT_PERMISSIONS.users.APPROVE}>
+                <Button
+                  type="submit"
+                  disabled={form.formState.isSubmitting || !canSubmit}
+                >
+                  {form.formState.isSubmitting ? "Submitting..." : "Confirm"}
+                </Button>
+              </PermissionGate>
             </DialogFooter>
           </form>
         </Form>

@@ -10,6 +10,9 @@ import {
 } from "@/services/departments";
 import { getPrograms, type Program } from "@/services/programs";
 import { Input } from "@/components/ui/input";
+import { usePermission } from "@/hooks/use-permission";
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
 const topVariants = [
   "bg-[#232323]",
@@ -22,10 +25,14 @@ const ProgramsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setBreadcrumbItem } = useBreadcrumb();
+  const { hasPermission } = usePermission();
   const [search, setSearch] = useState("");
+
   const [departmentsLoading, departmentsError, departmentsData] =
     useFetchData(getDepartments);
-  const [programsLoading, programsError, programsData] = useFetchData(getPrograms);
+
+  const [programsLoading, programsError, programsData] =
+    useFetchData(getPrograms);
 
   const departments: Department[] = departmentsData.departments || [];
   const programs: Program[] = programsData.programs || [];
@@ -56,6 +63,19 @@ const ProgramsPage = () => {
   useEffect(() => {
     setBreadcrumbItem("/admin/programs", "Faculties > Programs");
   }, [setBreadcrumbItem]);
+
+  // 🔥 PAGE PROTECTION
+  if (!hasPermission(ENDPOINT_PERMISSIONS.programs.READ)) {
+    return <PermissionProtectedPage />;
+  }
+
+  if (departmentsLoading || programsLoading) {
+    return <div className="p-6 text-white">Loading programs...</div>;
+  }
+
+  if (departmentsError || programsError) {
+    return <div className="p-6 text-red-400">Error loading programs.</div>;
+  }
 
   if (departmentsLoading || programsLoading) {
     return <div className="p-6 text-white">Loading programs...</div>;

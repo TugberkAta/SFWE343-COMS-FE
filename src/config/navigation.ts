@@ -1,4 +1,5 @@
 import { paths } from "@/utils/paths";
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
 import {
   ArrowLeft,
   type LucideIcon,
@@ -13,6 +14,7 @@ export interface NavMainItem {
   icon?: LucideIcon;
   isActive?: boolean;
   elementLinkId: string;
+  permission?: string;
   items?: {
     title: string;
     url: string;
@@ -33,18 +35,21 @@ export const getMainNavigation = (): NavMainItem[] => {
       url: paths.admin.faculties,
       icon: Users,
       elementLinkId: "teacher-outlines-link",
+      permission: ENDPOINT_PERMISSIONS.departments.READ,
     },
     {
       title: "Pending Users",
       url: paths.admin.pendingUsers,
       icon: User,
       elementLinkId: "pending-users-link",
+      permission: ENDPOINT_PERMISSIONS.users.APPROVE,
     },
     {
       title: "Users",
       url: paths.admin.usersWithRole,
       icon: Users,
       elementLinkId: "users-with-role-link",
+      permission: ENDPOINT_PERMISSIONS.users.READ,
     },
   ];
 
