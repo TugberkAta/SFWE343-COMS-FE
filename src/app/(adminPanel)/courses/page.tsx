@@ -7,6 +7,9 @@ import { useBreadcrumb } from "@/contexts/breadcrumb-context";
 import useFetchData from "@/hooks/use-fetch-data";
 import { getCourses, type Course } from "@/services/courses";
 import { getPrograms, type Program } from "@/services/programs";
+import { usePermission } from "@/hooks/use-permission";
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
 const topVariants = [
   "bg-[#232323]",
@@ -19,6 +22,7 @@ const CoursesPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setBreadcrumbItem } = useBreadcrumb();
+  const { hasPermission } = usePermission();
   const [search, setSearch] = useState("");
 
   const [coursesLoading, coursesError, coursesData] = useFetchData(getCourses);
@@ -53,6 +57,11 @@ const CoursesPage = () => {
   useEffect(() => {
     setBreadcrumbItem("/admin/courses", "Programs > Courses");
   }, [setBreadcrumbItem]);
+
+  // 🔥 PAGE PROTECTION
+  if (!hasPermission(ENDPOINT_PERMISSIONS.courses.READ)) {
+    return <PermissionProtectedPage />;
+  }
 
   if (coursesLoading || programsLoading) {
     return <div className="p-6 text-white">Loading courses...</div>;

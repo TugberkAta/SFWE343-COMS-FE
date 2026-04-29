@@ -8,6 +8,9 @@ import useFetchData from "@/hooks/use-fetch-data"
 import getUsersWithRole from "@/services/users/users-with-role"
 import type { UserWithRole } from "@/types/user-with-role"
 import { Loader2Icon, TriangleAlertIcon } from "lucide-react"
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
+import { usePermission } from "@/hooks/use-permission"
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage"
 
 function fullName(user: UserWithRole) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "—"
@@ -15,11 +18,16 @@ function fullName(user: UserWithRole) {
 
 export default function UsersWithRolePage() {
   const [search, setSearch] = React.useState("")
+  const { hasPermission } = usePermission()
 
   const [loading, errored, usersData] = useFetchData(
     () => getUsersWithRole(),
     []
   )
+
+  if (!hasPermission(ENDPOINT_PERMISSIONS.users.READ)) {
+    return <PermissionProtectedPage />
+  }
 
   if (loading) {
     return <Loader2Icon className="size-4 animate-spin" />
@@ -29,7 +37,7 @@ export default function UsersWithRolePage() {
     return <TriangleAlertIcon className="size-4 text-destructive" />
   }
 
-  const users = usersData.users ?? []
+  const users = usersData?.users ?? []
 
   const filteredData = users.filter((item: UserWithRole) => {
     const q = search.toLowerCase()
@@ -68,15 +76,6 @@ export default function UsersWithRolePage() {
             />
           </div>
 
-          {loading ? (
-            <p className="text-sm text-muted-foreground">Loading users…</p>
-          ) : errored ? (
-            <p className="text-sm text-destructive">
-              Could not load users. Check that you are signed in as an admin and
-              try again.
-            </p>
-          ) : null}
-
           <div className="border rounded-md overflow-hidden">
             <table className="w-full caption-bottom text-sm rounded-md">
               <thead className="[&_tr]:border-b bg-background/30">
@@ -89,7 +88,7 @@ export default function UsersWithRolePage() {
               </thead>
 
               <tbody>
-                {!loading && !errored && filteredData.length ? (
+                {filteredData.length ? (
                   filteredData.map((user: UserWithRole) => (
                     <tr
                       key={user.userId}
@@ -113,11 +112,7 @@ export default function UsersWithRolePage() {
                       colSpan={4}
                       className="p-6 text-center text-muted-foreground"
                     >
-                      {loading
-                        ? "Loading…"
-                        : errored
-                          ? "Failed to load data."
-                          : "No results."}
+                      No results.
                     </td>
                   </tr>
                 )}

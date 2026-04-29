@@ -8,6 +8,9 @@ import {
   type Department,
 } from "@/services/departments";
 import { Input } from "@/components/ui/input";
+import { usePermission } from "@/hooks/use-permission";
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
 const topVariants = [
   "bg-[#232323]",
@@ -19,9 +22,9 @@ const topVariants = [
 const FacultiesPage = () => {
   const navigate = useNavigate();
   const { setBreadcrumbItem } = useBreadcrumb();
+  const { hasPermission } = usePermission();
   const [search, setSearch] = useState("");
-  const [loading, error, data] =
-    useFetchData(getDepartments);
+  const [loading, error, data] = useFetchData(getDepartments);
 
   const departments: Department[] = data.departments || [];
   const normalizedSearch = search.trim().toLowerCase();
@@ -42,6 +45,11 @@ const FacultiesPage = () => {
   useEffect(() => {
     setBreadcrumbItem("/admin", "Faculties");
   }, [setBreadcrumbItem]);
+
+  // 🔥 PAGE PROTECTION
+  if (!hasPermission(ENDPOINT_PERMISSIONS.departments.READ)) {
+    return <PermissionProtectedPage />;
+  }
 
   if (loading) return <div className="p-6 text-white">Loading faculties...</div>;
   if (error) return <div className="p-6 text-red-400">Error loading faculties.</div>;

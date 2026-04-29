@@ -11,6 +11,9 @@ import type {
   OutlineObjective,
   OutlineWeeklyTopic,
 } from "@/services/outlines/get-outline-by-id";
+import { usePermission } from "@/hooks/use-permission";
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
 const keyValueClassName = "text-sm text-white/80";
 const richTextClassName =
@@ -29,11 +32,17 @@ export default function TeacherOutlineDetailsPage() {
   const outlineId = Number(params.outlineId);
   const isValidOutlineId = Number.isFinite(outlineId) && outlineId > 0;
 
+  const { hasPermission } = usePermission();
+
   const [loading, error, outlineData] = useFetchData(
     () => getOutlineById(outlineId),
     [outlineId],
     { enabled: isValidOutlineId }
   );
+
+  if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
+    return <PermissionProtectedPage />;
+  }
 
   if (loading) {
     return <div className="p-6 text-white">Loading outline details...</div>;

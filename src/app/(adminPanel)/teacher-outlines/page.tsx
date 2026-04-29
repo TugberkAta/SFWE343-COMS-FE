@@ -15,6 +15,10 @@ import { useState } from "react";
 import useFetchData from "@/hooks/use-fetch-data";
 import { deleteOutlineById, getOutlinePdfById, getOutlines } from "@/services/outlines";
 import CreateOutlineDialog from "./components/create-outline-dialog";
+import { usePermission } from "@/hooks/use-permission";
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
+import { PermissionGate } from "@/components/PermissionGate";
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
 type Outline = {
   outlineId: number;
@@ -44,17 +48,24 @@ function StatusBadge({ status }: { status: Outline["status"] }) {
 export default function TeacherOutlinesPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { hasPermission } = usePermission();
+
   const [downloadingOutlineId, setDownloadingOutlineId] = useState<number | null>(null);
   const [deletingOutlineId, setDeletingOutlineId] = useState<number | null>(null);
   const [outlinePendingDelete, setOutlinePendingDelete] = useState<{
     outlineId: number;
     courseCode?: string;
   } | null>(null);
+
   const programId = searchParams.get("programId");
   const courseId = searchParams.get("courseId");
   const selectedCourseId = courseId ? Number(courseId) : 0;
 
   const [loading, error, data, refetchOutlines] = useFetchData(getOutlines);
+
+  if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
+    return <PermissionProtectedPage />;
+  }
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading outlines</div>;
@@ -65,6 +76,7 @@ export default function TeacherOutlinesPage() {
   if (programId) {
     filteredOutlines = filteredOutlines.filter((outline: any) => outline.programId === parseInt(programId));
   }
+
   if (courseId) {
     filteredOutlines = filteredOutlines.filter((outline: any) => outline.courseId === parseInt(courseId));
   }
@@ -77,13 +89,17 @@ export default function TeacherOutlinesPage() {
         response.data instanceof Blob
           ? response.data
           : new Blob([response.data], { type: "application/pdf" });
+
       const url = window.URL.createObjectURL(pdfBlob);
       const link = document.createElement("a");
+
       link.href = url;
       link.download = `${courseCode || `outline-${outlineId}`}.pdf`;
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
       window.URL.revokeObjectURL(url);
     } catch (downloadError) {
       console.error("Failed to download outline PDF", downloadError);
@@ -109,13 +125,13 @@ export default function TeacherOutlinesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Course Outlines</h1>
-          <p className="text-sm text-gray-400">
-            Manage your course outlines
-          </p>
+          <p className="text-sm text-gray-400">Manage your course outlines</p>
         </div>
 
         <div className="flex gap-2">
-          <CreateOutlineDialog courseId={selectedCourseId} />
+          <PermissionGate permission={ENDPOINT_PERMISSIONS.outlines.WRITE}>
+            <CreateOutlineDialog courseId={selectedCourseId} />
+          </PermissionGate>
         </div>
       </div>
 
@@ -163,45 +179,53 @@ export default function TeacherOutlinesPage() {
                     >
                       <Eye size={16} />
                     </Button>
+
                     {item.status !== "published" ? (
-                      <CreateOutlineDialog
-                        courseId={item.courseId}
-                        outlineId={item.outlineId}
-                        trigger={
-                          <Button size="icon" variant="ghost">
-                            <Pencil size={16} />
-                          </Button>
-                        }
-                      />
+                      <PermissionGate permission={ENDPOINT_PERMISSIONS.outlines.EDIT}>
+                        <CreateOutlineDialog
+                          courseId={item.courseId}
+                          outlineId={item.outlineId}
+                          trigger={
+                            <Button size="icon" variant="ghost">
+                              <Pencil size={16} />
+                            </Button>
+                          }
+                        />
+                      </PermissionGate>
                     ) : null}
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() =>
-                        setOutlinePendingDelete({
-                          outlineId: item.outlineId,
-                          courseCode: item.courseCode,
-                        })
-                      }
-                      disabled={deletingOutlineId === item.outlineId}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() =>
-                        handleDownloadOutline(item.outlineId, item.courseCode)
-                      }
-                      disabled={downloadingOutlineId === item.outlineId}
-                    >
-                      <Download size={16} />
-                    </Button>
+
+                    <PermissionGate permission={ENDPOINT_PERMISSIONS.outlines.DELETE}>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() =>
+                          setOutlinePendingDelete({
+                            outlineId: item.outlineId,
+                            courseCode: item.courseCode,
+                          })
+                        }
+                        disabled={deletingOutlineId === item.outlineId}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </PermissionGate>
+
+                    <PermissionGate permission={ENDPOINT_PERMISSIONS.outlines.DOWNLOAD}>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() =>
+                          handleDownloadOutline(item.outlineId, item.courseCode)
+                        }
+                        disabled={downloadingOutlineId === item.outlineId}
+                      >
+                        <Download size={16} />
+                      </Button>
+                    </PermissionGate>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
-
           </Table>
         </CardContent>
       </Card>
@@ -224,6 +248,7 @@ export default function TeacherOutlinesPage() {
                 : "This outline will be permanently removed."}
             </DialogDescription>
           </DialogHeader>
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -232,20 +257,23 @@ export default function TeacherOutlinesPage() {
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={async () => {
-                if (!outlinePendingDelete) return;
-                await handleDeleteOutline(outlinePendingDelete.outlineId);
-                setOutlinePendingDelete(null);
-              }}
-              disabled={
-                !outlinePendingDelete ||
-                deletingOutlineId === outlinePendingDelete.outlineId
-              }
-            >
-              Confirm delete
-            </Button>
+
+            <PermissionGate permission={ENDPOINT_PERMISSIONS.outlines.DELETE}>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (!outlinePendingDelete) return;
+                  await handleDeleteOutline(outlinePendingDelete.outlineId);
+                  setOutlinePendingDelete(null);
+                }}
+                disabled={
+                  !outlinePendingDelete ||
+                  deletingOutlineId === outlinePendingDelete.outlineId
+                }
+              >
+                Confirm delete
+              </Button>
+            </PermissionGate>
           </DialogFooter>
         </DialogContent>
       </Dialog>
