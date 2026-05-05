@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Eye, Pencil, Trash2, Download } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
 import useFetchData from "@/hooks/use-fetch-data";
 import { deleteOutlineById, getOutlinePdfById, getOutlines } from "@/services/outlines";
 import CreateOutlineDialog from "./components/create-outline-dialog";
@@ -51,6 +52,7 @@ export default function TeacherOutlinesPage() {
   const { hasPermission } = usePermission();
 
   const [downloadingOutlineId, setDownloadingOutlineId] = useState<number | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [deletingOutlineId, setDeletingOutlineId] = useState<number | null>(null);
   const [outlinePendingDelete, setOutlinePendingDelete] = useState<{
     outlineId: number;
@@ -62,6 +64,22 @@ export default function TeacherOutlinesPage() {
   const selectedCourseId = courseId ? Number(courseId) : 0;
 
   const [loading, error, data, refetchOutlines] = useFetchData(getOutlines);
+
+  const getOutlinePdfFileName = (
+    courseCode?: string,
+    courseName?: string,
+    outlineId?: number,
+  ) => {
+    if (courseCode && courseName) {
+      const safeCourseName = courseName
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-zA-Z0-9_-]/g, "");
+      return `${courseCode}-${safeCourseName}.pdf`;
+    }
+
+    return `${courseCode || `outline-${outlineId}`}.pdf`;
+  };
 
   if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
     return <PermissionProtectedPage />;
@@ -81,7 +99,12 @@ export default function TeacherOutlinesPage() {
     filteredOutlines = filteredOutlines.filter((outline: any) => outline.courseId === parseInt(courseId));
   }
 
-  const handleDownloadOutline = async (outlineId: number, courseCode?: string) => {
+  const handleDownloadOutline = async (
+    outlineId: number,
+    courseCode?: string,
+    courseName?: string,
+  ) => {
+    setDownloadError(null);
     try {
       setDownloadingOutlineId(outlineId);
       const response = await getOutlinePdfById(outlineId);
@@ -90,11 +113,15 @@ export default function TeacherOutlinesPage() {
           ? response.data
           : new Blob([response.data], { type: "application/pdf" });
 
+      if (pdfBlob.size === 0) {
+        throw new Error("Downloaded PDF is empty");
+      }
+
       const url = window.URL.createObjectURL(pdfBlob);
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = `${courseCode || `outline-${outlineId}`}.pdf`;
+      link.download = getOutlinePdfFileName(courseCode, courseName, outlineId);
 
       document.body.appendChild(link);
       link.click();
@@ -102,6 +129,12 @@ export default function TeacherOutlinesPage() {
 
       window.URL.revokeObjectURL(url);
     } catch (downloadError) {
+      const message =
+        downloadError instanceof Error
+          ? downloadError.message
+          : "Failed to download outline PDF";
+      toast.error(message);
+      setDownloadError(message);
       console.error("Failed to download outline PDF", downloadError);
     } finally {
       setDownloadingOutlineId(null);
@@ -134,6 +167,13 @@ export default function TeacherOutlinesPage() {
           </PermissionGate>
         </div>
       </div>
+
+      {downloadError ? (
+        <div className="text-sm text-destructive">Download error: {downloadError}</div>
+      ) : null}
+      {downloadingOutlineId !== null ? (
+        <div className="text-sm text-gray-300">Downloading outline...</div>
+      ) : null}
 
       <Card className="bg-[#141414] border-white/10">
         <CardHeader>
@@ -215,7 +255,7 @@ export default function TeacherOutlinesPage() {
                         size="icon"
                         variant="ghost"
                         onClick={() =>
-                          handleDownloadOutline(item.outlineId, item.courseCode)
+                          handleDownloadOutline(item.outlineId, item.courseCode, item.courseName)
                         }
                         disabled={downloadingOutlineId === item.outlineId}
                       >
