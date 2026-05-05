@@ -10,7 +10,13 @@ vi.mock("react-router-dom", () => ({
 }));
 
 vi.mock("@/contexts/breadcrumb-context", () => ({
-  useBreadcrumb: () => ({ labels: {}, rules: {} }),
+  useBreadcrumb: () => ({
+    breadcrumbData: { labels: {}, rules: {}, searchParams: {} },
+    setBreadcrumbItem: vi.fn(),
+    removeBreadcrumbItem: vi.fn(),
+    setBreadcrumbRules: vi.fn(),
+    clearBreadcrumbData: vi.fn(),
+  }),
 }));
 
 vi.mock("@/components/ui/sidebar", () => ({
