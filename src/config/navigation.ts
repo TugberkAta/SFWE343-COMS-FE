@@ -6,6 +6,7 @@ import {
   Settings2,
   User,
   Users,
+  Shield,
 } from "lucide-react";
 
 export interface NavMainItem {
@@ -51,6 +52,13 @@ export const getMainNavigation = (): NavMainItem[] => {
       elementLinkId: "users-with-role-link",
       permission: ENDPOINT_PERMISSIONS.users.READ,
     },
+    {
+      title: "User Types",
+      url: paths.admin.userTypes,
+      icon: Shield,
+      elementLinkId: "user-types-link",
+      permission: ENDPOINT_PERMISSIONS.userTypes.READ,
+    },
   ];
 
   return baseNavigation;
@@ -86,4 +94,3 @@ export const settingsSecondaryNavigation: NavSecondaryItem[] = [
     elementLinkId: "back-to-main-link",
   },
 ];
-  

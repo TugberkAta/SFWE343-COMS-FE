@@ -5,6 +5,12 @@ export const ENDPOINT_PERMISSIONS = {
     EDIT: "users.edit",
     APPROVE: "users.approve",
   },
+  userTypes: {
+    READ: "userTypes.read",
+    WRITE: "userTypes.write",
+    EDIT: "userTypes.edit",
+    DELETE: "userTypes.delete",
+  },
   outlines: {
     READ: "outlines.read",
     WRITE: "outlines.write",
