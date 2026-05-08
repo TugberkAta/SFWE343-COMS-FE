@@ -72,10 +72,10 @@ export function RejectUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
-      <DialogContent>
+      <DialogContent className="bg-white border border-[#e5e7eb] shadow-lg rounded-lg">
         <DialogHeader>
-          <DialogTitle>Reject this request?</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-bold text-[#111827]">Reject this request?</DialogTitle>
+          <DialogDescription className="text-[#6b7280]">
             This removes the user from pending approval. They will need to sign
             up again if you want to reconsider later.
           </DialogDescription>
@@ -85,18 +85,18 @@ export function RejectUserDialog({
           <form onSubmit={onSubmit} className="space-y-4">
             {user ? (
               <div
-                className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm"
+                className="rounded-lg border border-[#e5e7eb] bg-[#f8f8f8] px-4 py-3 text-sm"
                 role="region"
                 aria-label="User to reject"
               >
                 <dl className="space-y-2">
                   <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                    <dt className="shrink-0 text-muted-foreground">Name</dt>
-                    <dd className="font-medium">{displayName(user)}</dd>
+                    <dt className="shrink-0 text-[#6b7280]">Name</dt>
+                    <dd className="font-medium text-[#111827]">{displayName(user)}</dd>
                   </div>
                   <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                    <dt className="shrink-0 text-muted-foreground">Email</dt>
-                    <dd className="break-all font-medium">{user.email}</dd>
+                    <dt className="shrink-0 text-[#6b7280]">Email</dt>
+                    <dd className="break-all font-medium text-[#111827]">{user.email}</dd>
                   </div>
                 </dl>
               </div>
@@ -108,6 +108,7 @@ export function RejectUserDialog({
                 variant="outline"
                 onClick={handleDismiss}
                 disabled={form.formState.isSubmitting}
+                className="border border-[#e5e7eb] text-[#111827] hover:bg-[#f8f8f8] rounded-lg"
               >
                 Cancel
               </Button>
@@ -118,6 +119,7 @@ export function RejectUserDialog({
                   type="submit"
                   variant="destructive"
                   disabled={form.formState.isSubmitting || !user}
+                  className="bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium disabled:opacity-50"
                 >
                   {form.formState.isSubmitting ? "Rejecting…" : "Reject request"}
                 </Button>

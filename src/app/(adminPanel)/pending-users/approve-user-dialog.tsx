@@ -105,10 +105,10 @@ export function ApproveUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
-      <DialogContent>
+      <DialogContent className="bg-white border border-[#e5e7eb] shadow-lg rounded-lg">
         <DialogHeader>
-          <DialogTitle>Approve user</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-bold text-[#111827]">Approve user</DialogTitle>
+          <DialogDescription className="text-[#6b7280]">
             {user
               ? `Select a role for ${displayName(user)} (${user.email}) before approving.`
               : "Select a role before approving this user."}
@@ -122,18 +122,18 @@ export function ApproveUserDialog({
               name="userRoleId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel className="text-[#111827] font-medium">Role</FormLabel>
 
                   {rolesLoading ? (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-[#6b7280]">
                       Loading roles…
                     </p>
                   ) : rolesErrored ? (
-                    <p className="text-sm text-destructive">
+                    <p className="text-sm text-red-600">
                       Could not load roles. Refresh the page and try again.
                     </p>
                   ) : roles.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-[#6b7280]">
                       No roles available.
                     </p>
                   ) : (
@@ -143,16 +143,17 @@ export function ApproveUserDialog({
                       disabled={form.formState.isSubmitting}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full bg-white border border-[#e5e7eb] rounded-lg text-[#111827] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2]">
                           <SelectValue placeholder="Select a role" />
                         </SelectTrigger>
                       </FormControl>
 
-                      <SelectContent>
+                      <SelectContent className="bg-white border border-[#e5e7eb] rounded-lg">
                         {roles.map((role) => (
                           <SelectItem
                             key={role.userRoleId}
                             value={String(role.userRoleId)}
+                            className="text-[#111827] hover:bg-[#fff1f2] focus:bg-[#fff1f2]"
                           >
                             {role.userRole}
                           </SelectItem>
@@ -161,7 +162,7 @@ export function ApproveUserDialog({
                     </Select>
                   )}
 
-                  <FormMessage />
+                  <FormMessage className="text-red-600" />
                 </FormItem>
               )}
             />
@@ -172,6 +173,7 @@ export function ApproveUserDialog({
                 variant="outline"
                 onClick={handleDismiss}
                 disabled={form.formState.isSubmitting}
+                className="border border-[#e5e7eb] text-[#111827] hover:bg-[#f8f8f8] rounded-lg"
               >
                 Cancel
               </Button>
@@ -180,6 +182,7 @@ export function ApproveUserDialog({
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting || !canSubmit}
+                  className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium disabled:opacity-50"
                 >
                   {form.formState.isSubmitting ? "Submitting..." : "Confirm"}
                 </Button>

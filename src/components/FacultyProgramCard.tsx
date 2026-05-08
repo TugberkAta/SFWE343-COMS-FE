@@ -24,19 +24,19 @@ export const FacultyProgramCard = ({
       type="button"
       onClick={onClick}
       className={cn(
-        "group w-full overflow-hidden rounded-[24px] border border-white/10 bg-[#111111] text-left shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-all duration-200 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_14px_30px_rgba(0,0,0,0.34)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] active:translate-y-0",
+        "group w-full overflow-hidden rounded-lg border border-[#e5e7eb] bg-white text-left shadow-sm transition-all duration-200 hover:shadow-md hover:border-[#ef233c]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ef233c] focus-visible:ring-offset-2",
       )}
     >
       <div
         className={cn(
-          "relative flex h-[220px] items-center justify-center",
-          topClassName ?? "bg-[#1b1b1b]"
+          "relative flex h-[220px] items-center justify-center bg-gradient-to-br from-[#ef233c] to-[#e60012]",
+          topClassName
         )}
       >
-        <div className="absolute left-1/2 top-1/2 h-[178px] w-[178px] -translate-x-[calc(50%-14px)] -translate-y-[calc(50%-14px)] bg-white" />
+        <div className="absolute left-1/2 top-1/2 h-[178px] w-[178px] -translate-x-[calc(50%-14px)] -translate-y-[calc(50%-14px)] bg-white opacity-10" />
 
-        <div className="relative z-10 flex aspect-square w-[178px] items-center justify-center border-[6px] border-black bg-[#f7f7f7]">
-          <div className="px-3 text-center text-black">
+        <div className="relative z-10 flex aspect-square w-[178px] items-center justify-center border-[6px] border-white bg-white">
+          <div className="px-3 text-center text-[#111827]">
             {posterTitle ? (
               <div className="text-[16px] font-semibold leading-[1.15]">
                 {posterTitle}
@@ -44,7 +44,7 @@ export const FacultyProgramCard = ({
             ) : null}
 
             {posterSubtitle ? (
-              <div className="mt-2 text-[14px] font-semibold leading-[1.2]">
+              <div className="mt-2 text-[14px] font-semibold leading-[1.2] text-[#ef233c]">
                 {posterSubtitle}
               </div>
             ) : null}
@@ -52,14 +52,14 @@ export const FacultyProgramCard = ({
         </div>
       </div>
 
-      <div className="min-h-[138px] bg-[#151515] px-5 py-6">
-        <h3 className="line-clamp-2 text-[20px] font-semibold leading-tight text-white">
+      <div className="min-h-[138px] bg-white px-5 py-6">
+        <h3 className="line-clamp-2 text-[20px] font-semibold leading-tight text-[#111827]">
           {title}
         </h3>
-        <p className="mt-2 text-sm text-white/65">
+        <p className="mt-2 text-sm text-[#6b7280]">
           {description ?? "Explore related items in this category."}
         </p>
-        <p className="mt-4 text-sm font-medium text-white/90 transition-colors group-hover:text-white">
+        <p className="mt-4 text-sm font-medium text-[#ef233c] transition-colors group-hover:text-[#e60012]">
           {ctaLabel ?? "View details"} <span aria-hidden>→</span>
         </p>
       </div>

@@ -15,9 +15,9 @@ import { usePermission } from "@/hooks/use-permission";
 import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
 import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
-const keyValueClassName = "text-sm text-white/80";
+const keyValueClassName = "text-sm text-[#6b7280]";
 const richTextClassName =
-  "text-sm text-white/80 [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1";
+  "text-sm text-[#6b7280] [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1";
 
 const renderEmpty = (value?: string | null) => value && value.trim() ? value : "-";
 const renderRichText = (value?: string | null) => {
@@ -45,7 +45,7 @@ export default function TeacherOutlineDetailsPage() {
   }
 
   if (loading) {
-    return <div className="p-6 text-white">Loading outline details...</div>;
+    return <div className="p-6 text-[#111827]">Loading outline details...</div>;
   }
 
   if (error || !outlineData.outline) {
@@ -60,11 +60,11 @@ export default function TeacherOutlineDetailsPage() {
     [...(outline.programLearningOutcomes || [])].sort((a, b) => Number(a.ploNumber) - Number(b.ploNumber));
 
   return (
-    <div className="space-y-6 p-6 text-white">
+    <div className="space-y-6 p-6 text-[#111827]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Course Outline Details</h1>
-          <p className="text-sm text-gray-400">
+          <h1 className="text-2xl font-semibold text-[#111827]">Course Outline Details</h1>
+          <p className="text-sm text-[#6b7280]">
             {outline.courseCode} - {outline.courseName}
           </p>
         </div>
@@ -73,9 +73,9 @@ export default function TeacherOutlineDetailsPage() {
         </Button>
       </div>
 
-      <Card className="border-white/10 bg-[#141414]">
+      <Card className="border-[#e5e7eb] bg-white">
         <CardHeader>
-          <CardTitle>Overview</CardTitle>
+          <CardTitle className="text-[#111827]">Overview</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2">
           <p className={keyValueClassName}>Status: {outline.status}</p>
@@ -87,13 +87,13 @@ export default function TeacherOutlineDetailsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-[#141414]">
+      <Card className="border-[#e5e7eb] bg-white">
         <CardHeader>
-          <CardTitle>Content</CardTitle>
+          <CardTitle className="text-[#111827]">Content</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="text-sm font-medium text-white/90">Objectives</h3>
+            <h3 className="text-sm font-medium text-[#111827]">Objectives</h3>
             <ul className="mt-2 space-y-2">
               {(outline.objectives || []).map((item: OutlineObjective) => (
                 <li key={item.objectiveId}>{renderRichText(item.objectiveText)}</li>
@@ -102,7 +102,7 @@ export default function TeacherOutlineDetailsPage() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-white/90">Content Items</h3>
+            <h3 className="text-sm font-medium text-[#111827]">Content Items</h3>
             <ul className="mt-2 space-y-2">
               {(outline.contentItems || []).map((item: OutlineContentItem) => (
                 <li key={item.contentItemId}>{renderRichText(item.contentText)}</li>
@@ -111,11 +111,11 @@ export default function TeacherOutlineDetailsPage() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-white/90">Learning Outcomes</h3>
+            <h3 className="text-sm font-medium text-[#111827]">Learning Outcomes</h3>
             <ul className="mt-2 space-y-2">
               {sortedLearningOutcomes.map((item) => (
                 <li key={item.cloId}>
-                  <span className="text-sm text-white/80">CLO-{item.cloNumber}:</span>
+                  <span className="text-sm text-[#6b7280]">CLO-{item.cloNumber}:</span>
                   {renderRichText(item.statement)}
                 </li>
               ))}
@@ -123,11 +123,11 @@ export default function TeacherOutlineDetailsPage() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-white/90">Program Learning Outcomes</h3>
+            <h3 className="text-sm font-medium text-[#111827]">Program Learning Outcomes</h3>
             <ul className="mt-2 space-y-2">
               {sortedProgramLearningOutcomes.map((item) => (
                 <li key={item.ploId}>
-                  <span className="text-sm text-white/80">PLO-{item.ploNumber}:</span>
+                  <span className="text-sm text-[#6b7280]">PLO-{item.ploNumber}:</span>
                   {renderRichText(item.statement)}
                 </li>
               ))}
@@ -136,25 +136,25 @@ export default function TeacherOutlineDetailsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-[#141414]">
+      <Card className="border-[#e5e7eb] bg-white">
         <CardHeader>
-          <CardTitle>Weekly Topics</CardTitle>
+          <CardTitle className="text-[#111827]">Weekly Topics</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {(outline.weeklyTopics || []).map((topic: OutlineWeeklyTopic) => (
-            <div key={topic.weeklyTopicId} className="rounded-md border border-white/10 p-3">
-              <p className="text-sm font-medium">
+            <div key={topic.weeklyTopicId} className="rounded-md border border-[#e5e7eb] p-3 bg-[#f8fafc]">
+              <p className="text-sm font-medium text-[#111827]">
                 Week {topic.weekNo}: {renderEmpty(topic.subjectTitle)}
               </p>
-              <div className="mt-1 text-sm text-white/75">
+              <div className="mt-1 text-sm text-[#6b7280]">
                 <span>Details:</span>
                 {renderRichText(topic.detailsText)}
               </div>
-              <div className="mt-1 text-sm text-white/75">
+              <div className="mt-1 text-sm text-[#6b7280]">
                 <span>Private Study:</span>
                 {renderRichText(topic.tasksPrivateStudyText)}
               </div>
-              <p className="mt-1 text-sm text-white/75">
+              <p className="mt-1 text-sm text-[#6b7280]">
                 CLOs: {(topic.clos || []).length ? topic.clos.map((clo) => `CLO-${clo.cloNumber}`).join(", ") : "-"}
               </p>
             </div>
@@ -162,17 +162,17 @@ export default function TeacherOutlineDetailsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-[#141414]">
+      <Card className="border-[#e5e7eb] bg-white">
         <CardHeader>
-          <CardTitle>Resources</CardTitle>
+          <CardTitle className="text-[#111827]">Resources</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="text-sm font-medium text-white/90">Textbooks</h3>
+            <h3 className="text-sm font-medium text-[#111827]">Textbooks</h3>
             {renderRichText(outline.textbooksText)}
           </div>
           <div>
-            <h3 className="text-sm font-medium text-white/90">Additional Reading</h3>
+            <h3 className="text-sm font-medium text-[#111827]">Additional Reading</h3>
             {renderRichText(outline.additionalReadingText)}
           </div>
           <p className={keyValueClassName}>Office Hours: {renderEmpty(outline.officeHours)}</p>
@@ -180,14 +180,14 @@ export default function TeacherOutlineDetailsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-[#141414]">
+      <Card className="border-[#e5e7eb] bg-white">
         <CardHeader>
-          <CardTitle>Evaluation</CardTitle>
+          <CardTitle className="text-[#111827]">Evaluation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {(outline.evaluationItems || []).map((item: OutlineEvaluationItem) => (
-            <div key={item.evaluationItemId} className="rounded-md border border-white/10 p-3">
-              <p className="text-sm font-medium">{renderEmpty(item.name)}</p>
+            <div key={item.evaluationItemId} className="rounded-md border border-[#e5e7eb] p-3 bg-[#f8fafc]">
+              <p className="text-sm font-medium text-[#111827]">{renderEmpty(item.name)}</p>
               <p className={keyValueClassName}>Weight: {item.weightPercent}%</p>
               <p className={keyValueClassName}>Count: {item.count}</p>
               <p className={keyValueClassName}>

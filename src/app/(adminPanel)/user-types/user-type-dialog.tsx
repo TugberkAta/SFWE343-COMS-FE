@@ -101,10 +101,10 @@ export function UserTypeDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
       {trigger && <>{trigger}</>}
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] bg-white border border-[#e5e7eb] rounded-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit User Type" : "Create User Type"}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-bold text-[#111827]">{isEdit ? "Edit User Type" : "Create User Type"}</DialogTitle>
+          <DialogDescription className="text-[#6b7280]">
             {isEdit
               ? "Update the user type name and assign permissions."
               : "Create a new user type and assign permissions."}
@@ -118,15 +118,16 @@ export function UserTypeDialog({
               name="userType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>User Type Name</FormLabel>
+                  <FormLabel className="text-[#111827] font-medium">User Type Name</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., Teacher, Admin, Coordinator"
                       {...field}
                       disabled={form.formState.isSubmitting}
+                      className="bg-white border border-[#e5e7eb] rounded-lg text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2]"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-600" />
                 </FormItem>
               )}
             />
@@ -136,11 +137,11 @@ export function UserTypeDialog({
               name="permissions"
               render={() => (
                 <FormItem>
-                  <FormLabel>Permissions</FormLabel>
+                  <FormLabel className="text-[#111827] font-medium">Permissions</FormLabel>
                   <div className="space-y-4">
                     {Object.entries(ENDPOINT_PERMISSIONS).map(([group, permissions]) => (
-                      <div key={group} className="border rounded-lg p-4">
-                        <h3 className="font-semibold text-sm mb-3 capitalize">
+                      <div key={group} className="border border-[#e5e7eb] rounded-lg p-4 bg-[#f8f8f8]">
+                        <h3 className="font-semibold text-sm mb-3 capitalize text-[#111827]">
                           {group} Management
                         </h3>
                         <div className="grid grid-cols-2 gap-3">
@@ -161,9 +162,10 @@ export function UserTypeDialog({
                                         field.onChange(newValue)
                                       }}
                                       disabled={form.formState.isSubmitting}
+                                      className="border-[#e5e7eb] accent-[#ef233c]"
                                     />
                                   </FormControl>
-                                  <FormLabel className="font-normal cursor-pointer">
+                                  <FormLabel className="font-normal cursor-pointer text-[#111827]">
                                     {key}
                                   </FormLabel>
                                 </FormItem>
@@ -174,7 +176,7 @@ export function UserTypeDialog({
                       </div>
                     ))}
                   </div>
-                  <FormMessage />
+                  <FormMessage className="text-red-600" />
                 </FormItem>
               )}
             />
@@ -185,10 +187,15 @@ export function UserTypeDialog({
                 variant="outline"
                 onClick={handleDismiss}
                 disabled={form.formState.isSubmitting}
+                className="border border-[#e5e7eb] text-[#111827] hover:bg-[#f8f8f8] rounded-lg"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button 
+                type="submit" 
+                disabled={form.formState.isSubmitting}
+                className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium disabled:opacity-50"
+              >
                 {form.formState.isSubmitting ? "Saving..." : isEdit ? "Update" : "Create"}
               </Button>
             </DialogFooter>

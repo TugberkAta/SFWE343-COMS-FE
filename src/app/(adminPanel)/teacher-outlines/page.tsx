@@ -33,13 +33,13 @@ type Outline = {
 
 function StatusBadge({ status }: { status: Outline["status"] }) {
   const styles = {
-    published: "bg-green-500/10 text-green-400 border border-green-500/20",
-    pending: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-    draft: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
+    published: "bg-green-100 text-green-700 border border-green-300",
+    pending: "bg-orange-100 text-orange-700 border border-orange-300",
+    draft: "bg-yellow-100 text-yellow-700 border border-yellow-300",
   };
 
   return (
-    <span className={`px-2 py-1 text-xs rounded-md ${styles[status]}`}>
+    <span className={`px-2 py-1 text-xs rounded-md font-medium ${styles[status]}`}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -67,8 +67,8 @@ export default function TeacherOutlinesPage() {
     return <PermissionProtectedPage />;
   }
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading outlines</div>;
+  if (loading) return <div className="p-6 text-[#111827]">Loading...</div>;
+  if (error) return <div className="p-6 text-red-600">Error loading outlines</div>;
 
   const allOutlines = data.outlines || [];
   let filteredOutlines = allOutlines;
@@ -121,11 +121,11 @@ export default function TeacherOutlinesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 text-white">
+    <div className="p-6 space-y-6 bg-[#f8f8f8] min-h-screen">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Course Outlines</h1>
-          <p className="text-sm text-gray-400">Manage your course outlines</p>
+          <h1 className="text-2xl font-semibold text-[#111827]">Course Outlines</h1>
+          <p className="text-sm text-[#6b7280]">Manage your course outlines</p>
         </div>
 
         <div className="flex gap-2">
@@ -135,38 +135,38 @@ export default function TeacherOutlinesPage() {
         </div>
       </div>
 
-      <Card className="bg-[#141414] border-white/10">
-        <CardHeader>
-          <CardTitle>My Course Outlines</CardTitle>
-          <CardDescription className="text-gray-400">
+      <div className="bg-white rounded-lg border border-[#e5e7eb] shadow-sm">
+        <div className="px-6 py-4 border-b border-[#e5e7eb]">
+          <h3 className="text-lg font-semibold text-[#111827]">My Course Outlines</h3>
+          <p className="text-sm text-[#6b7280] mt-1">
             View and manage your outlines
-          </CardDescription>
-        </CardHeader>
+          </p>
+        </div>
 
-        <CardContent>
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-white/10">
-                <TableHead>Course Code</TableHead>
-                <TableHead>Course Name</TableHead>
-                <TableHead>Program</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Academic Year</TableHead>
-                <TableHead>Semester</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="border-b border-[#e5e7eb] bg-[#f8f8f8]">
+                <TableHead className="text-[#111827] font-semibold">Course Code</TableHead>
+                <TableHead className="text-[#111827] font-semibold">Course Name</TableHead>
+                <TableHead className="text-[#111827] font-semibold">Program</TableHead>
+                <TableHead className="text-[#111827] font-semibold">Department</TableHead>
+                <TableHead className="text-[#111827] font-semibold">Academic Year</TableHead>
+                <TableHead className="text-[#111827] font-semibold">Semester</TableHead>
+                <TableHead className="text-[#111827] font-semibold">Status</TableHead>
+                <TableHead className="text-right text-[#111827] font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {filteredOutlines.map((item: any) => (
-                <TableRow key={item.outlineId} className="border-white/10">
-                  <TableCell>{item.courseCode}</TableCell>
-                  <TableCell>{item.courseName}</TableCell>
-                  <TableCell>{item.programName}</TableCell>
-                  <TableCell>{item.departmentName}</TableCell>
-                  <TableCell>{item.academicYear}</TableCell>
-                  <TableCell>{item.semester}</TableCell>
+                <TableRow key={item.outlineId} className="border-b border-[#e5e7eb] hover:bg-[#f8f8f8]">
+                  <TableCell className="text-[#111827]">{item.courseCode}</TableCell>
+                  <TableCell className="text-[#111827]">{item.courseName}</TableCell>
+                  <TableCell className="text-[#6b7280]">{item.programName}</TableCell>
+                  <TableCell className="text-[#6b7280]">{item.departmentName}</TableCell>
+                  <TableCell className="text-[#111827]">{item.academicYear}</TableCell>
+                  <TableCell className="text-[#111827]">{item.semester}</TableCell>
                   <TableCell>
                     <StatusBadge status={item.status} />
                   </TableCell>
@@ -176,6 +176,7 @@ export default function TeacherOutlinesPage() {
                       size="icon"
                       variant="ghost"
                       onClick={() => navigate(`/admin/teacher-outlines/${item.outlineId}`)}
+                      className="text-[#ef233c] hover:bg-[#fff1f2]"
                     >
                       <Eye size={16} />
                     </Button>
@@ -186,7 +187,7 @@ export default function TeacherOutlinesPage() {
                           courseId={item.courseId}
                           outlineId={item.outlineId}
                           trigger={
-                            <Button size="icon" variant="ghost">
+                            <Button size="icon" variant="ghost" className="text-[#ef233c] hover:bg-[#fff1f2]">
                               <Pencil size={16} />
                             </Button>
                           }
@@ -205,6 +206,7 @@ export default function TeacherOutlinesPage() {
                           })
                         }
                         disabled={deletingOutlineId === item.outlineId}
+                        className="text-red-600 hover:bg-red-50"
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -218,6 +220,7 @@ export default function TeacherOutlinesPage() {
                           handleDownloadOutline(item.outlineId, item.courseCode)
                         }
                         disabled={downloadingOutlineId === item.outlineId}
+                        className="text-[#6b7280] hover:bg-[#f8f8f8]"
                       >
                         <Download size={16} />
                       </Button>
@@ -227,8 +230,8 @@ export default function TeacherOutlinesPage() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Dialog
         open={Boolean(outlinePendingDelete)}
@@ -238,10 +241,10 @@ export default function TeacherOutlinesPage() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white border border-[#e5e7eb] rounded-lg">
           <DialogHeader>
-            <DialogTitle>Delete outline?</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#111827]">Delete outline?</DialogTitle>
+            <DialogDescription className="text-[#6b7280]">
               This action cannot be undone.{" "}
               {outlinePendingDelete?.courseCode
                 ? `The outline for ${outlinePendingDelete.courseCode} will be permanently removed.`
@@ -254,6 +257,7 @@ export default function TeacherOutlinesPage() {
               variant="outline"
               onClick={() => setOutlinePendingDelete(null)}
               disabled={deletingOutlineId !== null}
+              className="border border-[#e5e7eb] text-[#111827] hover:bg-[#f8f8f8]"
             >
               Cancel
             </Button>
@@ -270,6 +274,7 @@ export default function TeacherOutlinesPage() {
                   !outlinePendingDelete ||
                   deletingOutlineId === outlinePendingDelete.outlineId
                 }
+                className="bg-red-600 hover:bg-red-700 text-white"
               >
                 Confirm delete
               </Button>

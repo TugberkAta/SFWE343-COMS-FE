@@ -66,7 +66,7 @@ const tabNames = [
 
 type TabName = (typeof tabNames)[number];
 
-const inputClassName = "bg-[#101010] border-white/10 text-white";
+const inputClassName = "bg-white border-[#e5e7eb] text-[#111827] placeholder:text-[#9ca3af]";
 const MIN_CLO_COUNT = 5;
 const ASSESSMENT_WEIGHT_TARGET = 100;
 const ASSESSMENT_WEIGHT_TOLERANCE = 0.001;
@@ -713,7 +713,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                           <Button
                             type="button"
                             variant="outline"
-                            className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
+                            className="w-full justify-between border-[#e5e7eb] bg-white font-normal text-[#111827] hover:bg-[#f8fafc] hover:text-[#111827]"
                           >
                             <span className="truncate">
                               {approvedUserOptions.find((option) => option.value === String(field.value))?.label ??
@@ -770,7 +770,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                           <Button
                             type="button"
                             variant="outline"
-                            className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
+                            className="w-full justify-between border-[#e5e7eb] bg-white font-normal text-[#111827] hover:bg-[#f8fafc] hover:text-[#111827]"
                           >
                             <span className="truncate">
                               {field.value.length > 0
@@ -812,7 +812,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
           <div className="space-y-4">
             <div className="space-y-3 rounded-md border border-white/10 p-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Course Objectives</p>
+                <p className="text-sm font-medium text-[#111827]">Course Objectives</p>
                 <Button
                   type="button"
                   variant="outline"
@@ -854,9 +854,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </div>
               ))}
             </div>
-            <div className="space-y-3 rounded-md border border-white/10 p-3">
+            <div className="space-y-3 rounded-md border border-[#e5e7eb] p-3 bg-[#f8fafc]">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Content Items</p>
+                <p className="text-sm font-medium text-[#111827]">Content Items</p>
                 <Button
                   type="button"
                   variant="outline"
@@ -904,7 +904,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Learning Outcomes</p>
+              <p className="text-sm font-medium text-[#111827]">Learning Outcomes</p>
               <Button
                 type="button"
                 variant="outline"
@@ -974,7 +974,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Program Learning Outcomes</p>
+              <p className="text-sm font-medium text-[#111827]">Program Learning Outcomes</p>
               <Button
                 type="button"
                 variant="outline"
@@ -1039,7 +1039,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Weekly Topics</p>
+              <p className="text-sm font-medium text-[#111827]">Weekly Topics</p>
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
@@ -1215,7 +1215,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                                 <Button
                                   type="button"
                                   variant="outline"
-                                  className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
+                                  className="w-full justify-between border-[#e5e7eb] bg-white font-normal text-[#111827] hover:bg-[#f8fafc] hover:text-[#111827]"
                                 >
                                   <span className="truncate">{selectedCloLabel}</span>
                                 </Button>
@@ -1259,11 +1259,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     type="file"
                     accept=".csv,text/csv"
                     onChange={handleWeeklyTopicsCsvFileChange}
-                    className="w-full rounded-md border border-white/10 bg-[#101010] px-3 py-2 text-sm text-white file:mr-3 file:rounded file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-black hover:file:bg-gray-200"
+                    className="w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] file:mr-3 file:rounded file:border-0 file:bg-[#ef233c] file:px-3 file:py-1.5 file:text-white hover:file:bg-[#e60012]"
                   />
-                  <div className="rounded-md border border-white/10 bg-[#101010] p-3">
-                    <p className="text-xs font-medium text-white">CSV Example Structure</p>
-                    <pre className="mt-2 overflow-x-auto rounded border border-white/10 bg-[#0a0a0a] p-2 text-xs text-gray-300">
+                  <div className="rounded-md border border-[#e5e7eb] bg-[#f8fafc] p-3">
+                    <p className="text-xs font-medium text-[#111827]">CSV Example Structure</p>
+                    <pre className="mt-2 overflow-x-auto rounded border border-[#e5e7eb] bg-white p-2 text-xs text-[#6b7280]">
                       {`weekNo,weekDate,subjectTitle,detailsText,tasksPrivateStudyText,clos
 1,2026-10-05,Introduction to Systems,"Overview of systems and scope","Read chapter 1",CLO-1|CLO-2
 2,2026-10-12,Architecture Fundamentals,"Core architecture concepts","Prepare summary notes",CLO-2|CLO-3`}
@@ -1297,7 +1297,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Evaluation Items</p>
+              <p className="text-sm font-medium text-[#111827]">Evaluation Items</p>
               <Button
                 type="button"
                 variant="outline"
@@ -1409,7 +1409,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                                 <Button
                                   type="button"
                                   variant="outline"
-                                  className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
+                                  className="w-full justify-between border-[#e5e7eb] bg-white font-normal text-[#111827] hover:bg-[#f8fafc] hover:text-[#111827]"
                                 >
                                   <span className="truncate">{selectedCloLabel}</span>
                                 </Button>
@@ -1444,7 +1444,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Workload Items</p>
+              <p className="text-sm font-medium text-[#111827]">Workload Items</p>
               <Button
                 type="button"
                 variant="outline"
@@ -1467,7 +1467,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </p>
             ) : null}
             {workloadItemFields.map((item, index) => (
-              <div key={item.id} className="grid grid-cols-[1fr_160px_auto] gap-2 rounded-md border border-white/10 p-3">
+              <div key={item.id} className="grid grid-cols-[1fr_160px_auto] gap-2 rounded-md border border-[#e5e7eb] p-3 bg-[#f8fafc]">
                 <FormField
                   control={form.control}
                   name={`workloadItems.${index}.activity`}
@@ -1612,51 +1612,51 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   .join(", ");
 
         return (
-          <div className="space-y-4 text-sm text-gray-300">
+          <div className="space-y-4 text-sm text-[#6b7280]">
             <div>
-              <p className="text-base font-semibold text-white">Review your outline details</p>
-              <p className="mt-1 text-gray-400">
+              <p className="text-base font-semibold text-[#111827]">Review your outline details</p>
+              <p className="mt-1 text-[#9ca3af]">
                 Check each section before publishing. Use Previous if you want to edit anything.
               </p>
             </div>
 
             <div className="grid gap-4 grid-cols-1">
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Basic Info</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Basic Info</p>
                 <div className="space-y-2">
-                  <p><span className="text-gray-400">Course ID:</span> {values.courseId}</p>
-                  <p><span className="text-gray-400">Term:</span> {selectedTermLabel}</p>
-                  <p><span className="text-gray-400">Lecturer:</span> {selectedLecturerLabel}</p>
-                  <p><span className="text-gray-400">Assistants:</span> {selectedAssistantLabels}</p>
+                  <p><span className="text-[#6b7280]">Course ID:</span> {values.courseId}</p>
+                  <p><span className="text-[#6b7280]">Term:</span> {selectedTermLabel}</p>
+                  <p><span className="text-[#6b7280]">Lecturer:</span> {selectedLecturerLabel}</p>
+                  <p><span className="text-[#6b7280]">Assistants:</span> {selectedAssistantLabels}</p>
                 </div>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Learning Outcomes (CLOs)</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Learning Outcomes (CLOs)</p>
                 <div className="space-y-2">
                   {values.learningOutcomes.map((outcome) => (
                     <div key={outcome.cloCode}>
-                      <span className="text-gray-400">{outcome.cloCode}:</span>
+                      <span className="text-[#6b7280]">{outcome.cloCode}:</span>
                       {renderRichText(outcome.description)}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Program Learning Outcomes (PLOs)</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Program Learning Outcomes (PLOs)</p>
                 <div className="space-y-2">
                   {values.programLearningOutcomes.map((outcome) => (
                     <div key={outcome.ploCode}>
-                      <span className="text-gray-400">{outcome.ploCode}:</span>
+                      <span className="text-[#6b7280]">{outcome.ploCode}:</span>
                       {renderRichText(outcome.description)}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Objectives</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Objectives</p>
                 <ul className="list-disc space-y-1 pl-4">
                   {values.objectives.map((objective, index) => (
                     <li key={`objective-${index}`}>{renderRichText(objective.description)}</li>
@@ -1664,8 +1664,8 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </ul>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Content Items</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Content Items</p>
                 <ul className="list-disc space-y-1 pl-4">
                   {values.contentItems.map((item, index) => (
                     <li key={`content-${index}`}>{renderRichText(item.description)}</li>
@@ -1673,24 +1673,24 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </ul>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Weekly Plan</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Weekly Plan</p>
                 <div className="space-y-3">
                   {values.weeklyTopics.map((topic) => (
-                    <div key={`week-${topic.weekNo}`} className="rounded border border-white/10 p-3">
-                      <p><span className="text-gray-400">Week {topic.weekNo}:</span> {topic.subjectTitle || "-"}</p>
+                    <div key={`week-${topic.weekNo}`} className="rounded border border-[#e5e7eb] p-3 bg-[#f8fafc]">
+                      <p><span className="text-[#6b7280]">Week {topic.weekNo}:</span> {topic.subjectTitle || "-"}</p>
                       <p className="mt-1">
-                        <span className="text-gray-400">Date:</span> {topic.weekDate || "-"}
+                        <span className="text-[#6b7280]">Date:</span> {topic.weekDate || "-"}
                       </p>
                       <div className="mt-1">
-                        <span className="text-gray-400">Details:</span> {renderRichText(topic.detailsText)}
+                        <span className="text-[#6b7280]">Details:</span> {renderRichText(topic.detailsText)}
                       </div>
                       <div className="mt-1">
-                        <span className="text-gray-400">Tasks / Private Study:</span>{" "}
+                        <span className="text-[#6b7280]">Tasks / Private Study:</span>{" "}
                         {renderRichText(topic.tasksPrivateStudyText)}
                       </div>
                       <p className="mt-1">
-                        <span className="text-gray-400">Related CLOs:</span>{" "}
+                        <span className="text-[#6b7280]">Related CLOs:</span>{" "}
                         {topic.clos.length > 0 ? topic.clos.map((clo) => clo.cloCode).join(", ") : "-"}
                       </p>
                     </div>
@@ -1698,19 +1698,19 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </div>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Evaluation</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Evaluation</p>
                 <div className="space-y-3">
                   {values.evaluationItems.map((item, index) => (
-                    <div key={`assessment-${index}`} className="rounded border border-white/10 p-3">
+                    <div key={`assessment-${index}`} className="rounded border border-[#e5e7eb] p-3 bg-[#f8fafc]">
                       <p>
-                        <span className="text-gray-400">{item.title || "Untitled"}:</span> {item.weight}%
+                        <span className="text-[#6b7280]">{item.title || "Untitled"}:</span> {item.weight}%
                       </p>
                       <p className="mt-1">
-                        <span className="text-gray-400">Count:</span> {item.count || 0}
+                        <span className="text-[#6b7280]">Count:</span> {item.count || 0}
                       </p>
                       <p className="mt-1">
-                        <span className="text-gray-400">Related CLOs:</span>{" "}
+                        <span className="text-[#6b7280]">Related CLOs:</span>{" "}
                         {item.clos.length > 0 ? item.clos.map((clo) => clo.cloCode).join(", ") : "-"}
                       </p>
                     </div>
@@ -1718,8 +1718,8 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </div>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Workload</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Workload</p>
                 <ul className="list-disc space-y-1 pl-4">
                   {values.workloadItems.map((workload, index) => (
                     <li key={`workload-${index}`}>
@@ -1729,18 +1729,18 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </ul>
               </div>
 
-              <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Resources</p>
+              <div className="rounded-md border border-[#e5e7eb] bg-white p-4">
+                <p className="mb-3 text-sm font-semibold text-[#111827]">Resources</p>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-gray-400">Textbooks:</span> {renderRichText(values.textbooksText)}
+                    <span className="text-[#6b7280]">Textbooks:</span> {renderRichText(values.textbooksText)}
                   </div>
                   <div>
-                    <span className="text-gray-400">Additional Reading:</span>{" "}
+                    <span className="text-[#6b7280]">Additional Reading:</span>{" "}
                     {renderRichText(values.additionalReadingText)}
                   </div>
-                  <p><span className="text-gray-400">Office Hours:</span> {values.officeHours || "-"}</p>
-                  <p><span className="text-gray-400">Office Code:</span> {values.officeCode || "-"}</p>
+                  <p><span className="text-[#6b7280]">Office Hours:</span> {values.officeHours || "-"}</p>
+                  <p><span className="text-[#6b7280]">Office Code:</span> {values.officeCode || "-"}</p>
                 </div>
               </div>
             </div>

@@ -89,41 +89,41 @@ export default function PendingUsersPage() {
   }
 
   return (
-    <div className="w-full p-6 space-y-6">
+    <div className="w-full p-6 space-y-6 bg-[#f8f8f8]">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">User Requests</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-[#111827]">User Requests</h1>
+          <p className="text-sm text-[#6b7280]">
             Approve or reject incoming user requests.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 rounded-full border px-3 py-1">
-          <span className="text-xs text-muted-foreground">Pending</span>
-          <span className="text-sm font-semibold">{filteredData.length}</span>
+        <div className="flex items-center gap-2 rounded-full border border-[#e5e7eb] px-3 py-1 bg-white">
+          <span className="text-xs text-[#6b7280]">Pending</span>
+          <span className="text-sm font-semibold text-[#111827]">{filteredData.length}</span>
         </div>
       </div>
 
-      <Card className="border-border">
-        <CardContent className="space-y-4 p-6">
+      <div className="bg-white rounded-lg border border-[#e5e7eb] shadow-sm">
+        <div className="space-y-4 p-6">
           <div className="flex items-center py-2">
             <Input
               placeholder="Filter emails or names..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="max-w-sm"
+              className="max-w-sm bg-white border border-[#e5e7eb] rounded-lg text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2]"
               disabled={loading || errored}
             />
           </div>
 
-          <div className="border rounded-md overflow-hidden">
-            <table className="w-full caption-bottom text-sm rounded-md">
-              <thead className="[&_tr]:border-b bg-background/30">
-                <tr className="border-b hover:bg-muted/50">
-                  <th className="h-12 px-4 text-left font-medium">Name</th>
-                  <th className="h-12 px-4 text-left font-medium">Email</th>
-                  <th className="h-12 px-4 text-left font-medium">Joined</th>
-                  <th className="h-12 px-4 text-right font-medium">Actions</th>
+          <div className="border border-[#e5e7eb] rounded-lg overflow-hidden">
+            <table className="w-full caption-bottom text-sm">
+              <thead className="bg-[#f8f8f8] border-b border-[#e5e7eb]">
+                <tr>
+                  <th className="h-12 px-4 text-left font-semibold text-[#111827]">Name</th>
+                  <th className="h-12 px-4 text-left font-semibold text-[#111827]">Email</th>
+                  <th className="h-12 px-4 text-left font-semibold text-[#111827]">Joined</th>
+                  <th className="h-12 px-4 text-right font-semibold text-[#111827]">Actions</th>
                 </tr>
               </thead>
 
@@ -132,13 +132,13 @@ export default function PendingUsersPage() {
                   filteredData.map((user: UserWithNoRole) => (
                     <tr
                       key={user.userId}
-                      className="border-b hover:bg-muted/50 bg-background/30"
+                      className="border-b border-[#e5e7eb] hover:bg-[#f8f8f8] bg-white transition-colors"
                     >
-                      <td className="p-4 font-medium">{fullName(user)}</td>
-                      <td className="p-4 text-muted-foreground">
+                      <td className="p-4 font-medium text-[#111827]">{fullName(user)}</td>
+                      <td className="p-4 text-[#6b7280]">
                         {user.email}
                       </td>
-                      <td className="p-4 text-muted-foreground">
+                      <td className="p-4 text-[#6b7280]">
                         {user.createdAt
                           ? new Date(user.createdAt).toLocaleString()
                           : "—"}
@@ -151,6 +151,7 @@ export default function PendingUsersPage() {
                             <Button
                               size="sm"
                               onClick={() => openApprove(user)}
+                              className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium"
                             >
                               Approve
                             </Button>
@@ -162,6 +163,7 @@ export default function PendingUsersPage() {
                               size="sm"
                               variant="destructive"
                               onClick={() => openReject(user)}
+                              className="bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium"
                             >
                               Reject
                             </Button>
@@ -175,7 +177,7 @@ export default function PendingUsersPage() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="p-6 text-center text-muted-foreground"
+                      className="p-6 text-center text-[#6b7280]"
                     >
                       No results.
                     </td>
@@ -187,16 +189,24 @@ export default function PendingUsersPage() {
 
           <div className="flex items-center justify-end">
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border border-[#e5e7eb] text-[#111827] hover:bg-[#f8f8f8] rounded-lg"
+              >
                 Previous
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border border-[#e5e7eb] text-[#111827] hover:bg-[#f8f8f8] rounded-lg"
+              >
                 Next
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <ApproveUserDialog
         open={dialog.type === "approve"}

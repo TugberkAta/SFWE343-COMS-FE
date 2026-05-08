@@ -54,9 +54,13 @@ export function NavMain({ items, label }: NavMainProps) {
               defaultOpen={isItemActive || item.isActive}
             >
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={item.title}>
+                <SidebarMenuButton 
+                  asChild 
+                  tooltip={item.title}
+                  className={isItemActive ? "bg-[#ef233c] text-white hover:bg-[#e60012]" : "text-[#374151] hover:bg-[#fff1f2] hover:text-[#ef233c]"}
+                >
                   {item.items?.length ? (
-                    <CollapsibleTrigger asChild className="text-sidebar-foreground/70">
+                    <CollapsibleTrigger asChild>
                       <Link
                         to={item.url ?? "#"}
                         id={item.elementLinkId}
@@ -75,7 +79,6 @@ export function NavMain({ items, label }: NavMainProps) {
                       to={item.url ?? "#"}
                       id={item.elementLinkId}
                       data-active={item.url === pathname}
-                      className="text-sidebar-foreground/70"
                     >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
@@ -85,8 +88,8 @@ export function NavMain({ items, label }: NavMainProps) {
                 {item.items?.length ? (
                   <>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuAction className="data-[state=open]:rotate-90">
-                        <ChevronRight className="text-sidebar-foreground/70" />
+                      <SidebarMenuAction className={isItemActive ? "text-white" : "text-[#374151]"}>
+                        <ChevronRight className={isItemActive ? "text-white" : "text-[#374151]"} />
                         <span className="sr-only">Toggle</span>
                       </SidebarMenuAction>
                     </CollapsibleTrigger>
@@ -97,7 +100,7 @@ export function NavMain({ items, label }: NavMainProps) {
                             <SidebarMenuSubButton
                               asChild
                               data-active={subItem.url === pathname}
-                              className="text-sidebar-foreground/70"
+                              className={subItem.url === pathname ? "bg-[#ef233c] text-white hover:bg-[#e60012]" : "text-[#374151] hover:bg-[#fff1f2] hover:text-[#ef233c]"}
                             >
                               <Link to={subItem.url}>
                                 <span>{subItem.title}</span>

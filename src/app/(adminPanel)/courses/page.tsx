@@ -12,10 +12,10 @@ import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
 import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
 
 const topVariants = [
-  "bg-[#232323]",
-  "bg-[#1f1f1f]",
-  "bg-[#262626]",
-  "bg-[#202020]",
+  "bg-gradient-to-br from-[#ef233c] to-[#e60012]",
+  "bg-gradient-to-br from-[#e60012] to-[#ef233c]",
+  "bg-gradient-to-br from-[#ef233c] to-[#e60012]",
+  "bg-gradient-to-br from-[#e60012] to-[#ef233c]",
 ];
 
 const CoursesPage = () => {
@@ -64,18 +64,18 @@ const CoursesPage = () => {
   }
 
   if (coursesLoading || programsLoading) {
-    return <div className="p-6 text-white">Loading courses...</div>;
+    return <div className="p-6 text-[#111827]">Loading courses...</div>;
   }
 
   if (coursesError || programsError) {
-    return <div className="p-6 text-red-400">Error loading courses.</div>;
+    return <div className="p-6 text-red-600">Error loading courses.</div>;
   }
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-8 p-6 bg-[#f8f8f8] min-h-screen">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-white">Courses</h1>
-        <p className="mt-2 text-lg text-white/65">
+        <h1 className="text-4xl font-bold tracking-tight text-[#111827]">Courses</h1>
+        <p className="mt-2 text-lg text-[#6b7280]">
           {selectedProgram
             ? `Select a course in ${selectedProgram.name}.`
             : "Select a course."}
@@ -86,7 +86,7 @@ const CoursesPage = () => {
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="Search courses..."
-        className="max-w-md"
+        className="max-w-md bg-white border border-[#e5e7eb] text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2] rounded-lg"
       />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 md:grid-cols-2">
@@ -109,7 +109,7 @@ const CoursesPage = () => {
       </div>
 
       {!filteredCourses.length ? (
-        <p className="text-sm text-white/65">No courses match your search.</p>
+        <p className="text-sm text-[#6b7280]">No courses match your search.</p>
       ) : null}
     </div>
   );

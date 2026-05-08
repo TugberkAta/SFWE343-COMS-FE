@@ -38,29 +38,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   });
 
   return (
-    <Sidebar variant="inset" {...props}>
-      <SidebarHeader>
+    <Sidebar variant="inset" {...props} className="bg-white border-r border-[#e5e7eb]">
+      <SidebarHeader className="bg-white border-b border-[#e5e7eb]">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               asChild
-              className="h-auto py-3 hover:bg-(--sidebar-logo-bg) data-[state=open]:bg-(--sidebar-logo-bg)"
+              className="h-auto py-3 hover:bg-[#f8f8f8] data-[state=open]:bg-[#f8f8f8]"
             >
               <Link to="/admin">
                 <div className="flex flex-col items-center justify-center w-full">
-                  <SettingsIcon />
-                  <span className="text-sm font-semibold">Admin</span>
+                  <SettingsIcon className="text-[#ef233c]" />
+                  <span className="text-sm font-semibold text-[#111827]">Admin</span>
                 </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <div className="border-b border-sidebar-border mx-2 mt-2" />
+        <div className="border-b border-[#e5e7eb] mx-2 mt-2" />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="bg-white">
         {isSettingsSection ? (
           <NavMain items={settingsTabs} />
         ) : (
@@ -77,9 +77,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
       </SidebarContent>
 
-      <div className="border-b border-sidebar-border mx-2 mt-2" />
+      <div className="border-b border-[#e5e7eb] mx-2 mt-2" />
 
-      <SidebarFooter>
+      <SidebarFooter className="bg-white border-t border-[#e5e7eb]">
         <NavUser
           user={{
             name: "John Doe",

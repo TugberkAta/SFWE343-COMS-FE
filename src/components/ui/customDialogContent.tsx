@@ -45,14 +45,14 @@ export const CustomDialogContent = ({
         e.preventDefault();
       }}
     >
-      <DialogHeader className="h-[50px] flex justify-center">
+      <DialogHeader className="h-[50px] flex justify-center bg-white border-b border-[#e5e7eb]">
         <div className="flex items-center h-full gap-10 ml-2">
           <DialogClose asChild>
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="icon">
-                <X className="w-4 h-4 text-subtle" />
+                <X className="w-4 h-4 text-[#6b7280]" />
               </Button>
-              <p className="px-2 rounded-md text-sm">esc</p>
+              <p className="px-2 rounded-md text-sm text-[#6b7280]">esc</p>
             </div>
           </DialogClose>
           {tabs && (
@@ -62,34 +62,34 @@ export const CustomDialogContent = ({
                   key={tab.name}
                   onClick={tab.onClick}
                   className={cn(
-                    "flex items-center min-w-[200px] h-full border-x border-gray-200/10 shrink-0",
-                    currentTab !== tab.name && "bg-[#18181B]"
+                    "flex items-center min-w-[200px] h-full border-x border-[#e5e7eb] shrink-0 hover:bg-[#f8fafc]",
+                    currentTab !== tab.name && "bg-white"
                   )}
                 >
                   <div
                     className={cn(
                       "flex items-center gap-2 ml-4",
-                      currentTab !== tab.name && "opacity-50"
+                      currentTab !== tab.name && "opacity-60"
                     )}
                   >
                     <Circle
                       className={cn(
-                        "w-4 h-4 text-subtle",
-                        currentTab === tab.name && "text-blue-400"
+                        "w-4 h-4 text-[#d1d5db]",
+                        currentTab === tab.name && "text-[#ef233c]"
                       )}
                     />
-                    <p className="text-white text-sm font-bold">{tab.name}</p>
+                    <p className={cn("text-sm font-bold", currentTab === tab.name ? "text-[#111827]" : "text-[#6b7280]")}>{tab.name}</p>
                   </div>
                 </button>
               ))}
             </div>
           )}
-          {title && hideTitle && <span className="ml-auto mr-4">{title}</span>}
+          {title && hideTitle && <span className="ml-auto mr-4 text-[#111827]">{title}</span>}
         </div>
       </DialogHeader>
       <div
         className={cn(
-          "px-6 grow flex-1 flex justify-center",
+          "px-6 grow flex-1 flex justify-center bg-white",
           wrapperClassName
         )}
       >
@@ -97,17 +97,17 @@ export const CustomDialogContent = ({
           <div
             className={cn("w-full flex flex-col gap-2", hideTitle && "sr-only")}
           >
-            <DialogTitle className="text-white text-2xl font-bold">
+            <DialogTitle className="text-[#111827] text-2xl font-bold">
               {title}
             </DialogTitle>
-            <div className="text-subtle text-sm mb-8">{description}</div>
+            <div className="text-[#6b7280] text-sm mb-8">{description}</div>
           </div>
 
           {children}
         </div>
       </div>
       {onConfirm && (
-        <DialogFooter className="h-[60px]">
+        <DialogFooter className="h-[60px] bg-white border-t border-[#e5e7eb]">
           <div className="flex items-center gap-2 mr-4">
             <DialogClose asChild>
               <Button

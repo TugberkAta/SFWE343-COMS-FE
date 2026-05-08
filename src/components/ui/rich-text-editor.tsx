@@ -41,7 +41,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "max-w-none rounded-b-md border border-t-0 border-white/10 bg-[#101010] px-3 py-2 text-sm text-white focus:outline-none [&_p]:my-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1",
+          "max-w-none rounded-b-md border border-t-0 border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#ef233c] focus:ring-offset-0 [&_p]:my-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1",
       },
     },
     onUpdate: ({ editor: currentEditor }) => {
@@ -59,7 +59,7 @@ export default function RichTextEditor({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex items-center gap-1 rounded-t-md border border-white/10 bg-[#0f0f0f] p-1">
+      <div className="flex items-center gap-1 rounded-t-md border border-[#e5e7eb] bg-[#f8fafc] p-1">
         <Button
           type="button"
           variant="ghost"
@@ -100,7 +100,7 @@ export default function RichTextEditor({
         >
           <ListOrdered className="size-4" />
         </Button>
-        {placeholder ? <span className="ml-2 text-xs text-gray-400">{placeholder}</span> : null}
+        {placeholder ? <span className="ml-2 text-xs text-[#9ca3af]">{placeholder}</span> : null}
       </div>
       <EditorContent editor={editor} className={cn("[&_div[contenteditable='true']]:rounded-t-none", minHeightClassName)} />
     </div>

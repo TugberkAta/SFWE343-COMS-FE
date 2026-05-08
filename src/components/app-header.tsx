@@ -61,12 +61,12 @@ export function PageHeader() {
   }, [pathSegments, breadcrumbData.rules, breadcrumbData.labels]);
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2">
+    <header className="flex h-16 shrink-0 items-center gap-2 bg-white border-b border-[#e5e7eb]">
       <div className="flex items-center gap-2 px-4">
-        <SidebarTrigger className="-ml-1 text-foreground" />
+        <SidebarTrigger className="-ml-1 text-[#111827]" />
         <Separator
           orientation="vertical"
-          className="mr-2 data-[orientation=vertical]:h-4"
+          className="mr-2 data-[orientation=vertical]:h-4 bg-[#e5e7eb]"
         />
         <Breadcrumb>
           <BreadcrumbList>
@@ -74,10 +74,10 @@ export function PageHeader() {
               <Fragment key={item.url}>
                 <BreadcrumbItem>
                   {index === breadcrumbItems.length - 1 ? (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage className="text-[#111827]">{item.label}</BreadcrumbPage>
                   ) : item.isValid ? (
                     <BreadcrumbLink asChild>
-                      <Link to={`${item.url}${breadcrumbData.searchParams[item.url] || ''}`}>{item.label}</Link>
+                      <Link to={`${item.url}${breadcrumbData.searchParams[item.url] || ''}`} className="text-[#ef233c] hover:text-[#e60012]">{item.label}</Link>
                     </BreadcrumbLink>
                   ) : (
                     <span className="text-muted-foreground cursor-default">
