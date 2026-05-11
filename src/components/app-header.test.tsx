@@ -1,27 +1,45 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { PageHeader } from "./app-header";
 
 vi.mock("react-router-dom", () => ({
-  useLocation: () => ({ pathname: "/projects/123" }),
+  useLocation: () => ({ pathname: "/admin/courses" }),
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
     <a href={to}>{children}</a>
   ),
 }));
 
 vi.mock("@/contexts/breadcrumb-context", () => ({
-  useBreadcrumb: () => ({ labels: {}, rules: {} }),
+  useBreadcrumb: () => ({
+    breadcrumbData: {
+      labels: {},
+      rules: {},
+      searchParams: {},
+    },
+  }),
 }));
 
 vi.mock("@/components/ui/sidebar", () => ({
-  SidebarTrigger: () => <button>Toggle</button>,
+  SidebarTrigger: () => <button>Toggle Sidebar</button>,
 }));
 
 vi.mock("@/components/ui/separator", () => ({
-  Separator: () => <hr />,
+  Separator: () => <hr data-testid="separator" />,
+}));
+
+vi.mock("@/constants/routes", () => ({
+  isValidRoute: () => true,
+}));
+
+vi.mock("@/utils/capitalize", () => ({
+  capitalize: (str: string) => str.charAt(0).toUpperCase() + str.slice(1),
 }));
 
 describe("PageHeader", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders without crashing", () => {
     render(<PageHeader />);
     expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -34,6 +52,17 @@ describe("PageHeader", () => {
 
   it("shows sidebar trigger button", () => {
     render(<PageHeader />);
-    expect(screen.getByText("Toggle")).toBeInTheDocument();
+    expect(screen.getByText("Toggle Sidebar")).toBeInTheDocument();
+  });
+
+  it("renders breadcrumb items based on pathname", () => {
+    render(<PageHeader />);
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+    expect(screen.getByText("Courses")).toBeInTheDocument();
+  });
+
+  it("renders separator between trigger and breadcrumb", () => {
+    render(<PageHeader />);
+    expect(screen.getByTestId("separator")).toBeInTheDocument();
   });
 });
