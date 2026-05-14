@@ -6,14 +6,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useFetchData from "@/hooks/use-fetch-data"
 import getUsersWithRole from "@/services/users/users-with-role"
-import getUserRoles from "@/services/users/get-user-roles"
+import { getUserTypes } from "@/services/user-types"
 import type { UserWithRole } from "@/types/user-with-role"
 import { Loader2Icon, TriangleAlertIcon, Pencil } from "lucide-react"
 import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
 import { usePermission } from "@/hooks/use-permission"
 import { PermissionGate } from "@/components/PermissionGate"
 import { PermissionProtectedPage } from "@/components/PermissionProtectedPage"
-import { AssignRoleDialog } from "./assign-role-dialog"
+import { AssignUserTypeDialog } from "./assign-user-type-dialog"
 
 function fullName(user: UserWithRole) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "—"
@@ -21,7 +21,7 @@ function fullName(user: UserWithRole) {
 
 export default function UsersWithRolePage() {
   const [search, setSearch] = React.useState("")
-  const [assignRoleDialog, setAssignRoleDialog] = React.useState<{
+  const [assignTypeDialog, setAssignTypeDialog] = React.useState<{
     open: boolean
     user: UserWithRole | null
   }>({ open: false, user: null })
@@ -32,8 +32,8 @@ export default function UsersWithRolePage() {
     []
   )
 
-  const [rolesLoading, rolesErrored, rolesData] = useFetchData(
-    () => getUserRoles(),
+  const [typesLoading, typesErrored, typesData] = useFetchData(
+    () => getUserTypes(),
     []
   )
 
@@ -41,27 +41,28 @@ export default function UsersWithRolePage() {
     return <PermissionProtectedPage />
   }
 
-  if (loading || rolesLoading) {
+  if (loading || typesLoading) {
     return <Loader2Icon className="size-4 animate-spin" />
   }
 
-  if (errored || rolesErrored) {
+  if (errored || typesErrored) {
     return <TriangleAlertIcon className="size-4 text-destructive" />
   }
 
   const users = usersData?.users ?? []
-  const roles = rolesData.userRoles ?? []
+  const userTypes = typesData?.userTypes ?? []
 
   const filteredData = users.filter((item: UserWithRole) => {
     const q = search.toLowerCase()
+    const typeLabel = (item.typeName ?? "").toLowerCase()
     return (
       item.email.toLowerCase().includes(q) ||
       fullName(item).toLowerCase().includes(q) ||
-      (item.userRole ?? "").toLowerCase().includes(q)
+      typeLabel.includes(q)
     )
   })
 
-  const handleAssignRoleSuccess = async () => {
+  const handleAssignSuccess = async () => {
     await refetch()
   }
 
@@ -71,7 +72,7 @@ export default function UsersWithRolePage() {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Users</h1>
           <p className="text-sm text-muted-foreground">
-            All registered users that already have a role assigned.
+            Registered users and their assigned user type.
           </p>
         </div>
 
@@ -85,7 +86,7 @@ export default function UsersWithRolePage() {
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center py-2">
             <Input
-              placeholder="Filter by name, email, or role…"
+              placeholder="Filter by name, email, or type…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="max-w-sm"
@@ -99,7 +100,7 @@ export default function UsersWithRolePage() {
                 <tr className="border-b hover:bg-muted/50">
                   <th className="h-12 px-4 text-left font-medium">Name</th>
                   <th className="h-12 px-4 text-left font-medium">Email</th>
-                  <th className="h-12 px-4 text-left font-medium">Role</th>
+                  <th className="h-12 px-4 text-left font-medium">Type</th>
                   <th className="h-12 px-4 text-left font-medium">Joined</th>
                   <th className="h-12 px-4 text-right font-medium">Actions</th>
                 </tr>
@@ -115,9 +116,9 @@ export default function UsersWithRolePage() {
                       <td className="p-4 font-medium">{fullName(user)}</td>
                       <td className="p-4 text-muted-foreground">{user.email}</td>
                       <td className="p-4">
-                        {user.userRole ? (
-                          <span className="inline-flex items-center rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400 border border-blue-500/20">
-                            {user.userRole}
+                        {user.typeName ? (
+                          <span className="inline-flex items-center rounded-full bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300 border border-violet-500/20">
+                            {user.typeName}
                           </span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
@@ -135,7 +136,7 @@ export default function UsersWithRolePage() {
                               size="icon"
                               variant="ghost"
                               onClick={() =>
-                                setAssignRoleDialog({ open: true, user })
+                                setAssignTypeDialog({ open: true, user })
                               }
                             >
                               <Pencil className="size-4" />
@@ -172,17 +173,16 @@ export default function UsersWithRolePage() {
         </CardContent>
       </Card>
 
-      {/* Assign Role Dialog */}
-      <AssignRoleDialog
-        open={assignRoleDialog.open}
+      <AssignUserTypeDialog
+        open={assignTypeDialog.open}
         onOpenChange={(open) =>
-          setAssignRoleDialog({ open, user: assignRoleDialog.user })
+          setAssignTypeDialog({ open, user: assignTypeDialog.user })
         }
-        user={assignRoleDialog.user}
-        roles={roles}
-        rolesLoading={rolesLoading}
-        rolesErrored={rolesErrored}
-        onAssigned={handleAssignRoleSuccess}
+        user={assignTypeDialog.user}
+        userTypes={userTypes}
+        userTypesLoading={typesLoading}
+        userTypesErrored={typesErrored}
+        onAssigned={handleAssignSuccess}
       />
     </div>
   )

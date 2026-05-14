@@ -16,7 +16,7 @@ const userTypes = {
   getAll: () => `/user-types`,
   getById: (userTypeId: number) => `/user-types/${userTypeId}`,
   create: () => `/user-types`,
-  patchById: (userTypeId: number) => `/user-types/${userTypeId}`,
+  putById: (userTypeId: number) => `/user-types/${userTypeId}`,
   deleteById: (userTypeId: number) => `/user-types/${userTypeId}`,
 };
 

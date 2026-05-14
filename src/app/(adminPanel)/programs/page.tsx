@@ -65,7 +65,7 @@ const ProgramsPage = () => {
   }, [setBreadcrumbItem]);
 
   // 🔥 PAGE PROTECTION
-  if (!hasPermission(ENDPOINT_PERMISSIONS.programs.READ)) {
+  if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
     return <PermissionProtectedPage />;
   }
 

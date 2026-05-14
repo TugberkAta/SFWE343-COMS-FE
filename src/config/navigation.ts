@@ -36,7 +36,7 @@ export const getMainNavigation = (): NavMainItem[] => {
       url: paths.admin.faculties,
       icon: Users,
       elementLinkId: "teacher-outlines-link",
-      permission: ENDPOINT_PERMISSIONS.departments.READ,
+      permission: ENDPOINT_PERMISSIONS.outlines.READ,
     },
     {
       title: "Pending Users",

@@ -29,69 +29,72 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import patchUserRole from "@/services/users/patch-user-role"
-import type { UserRoleRecord } from "@/types/user-role"
 import type { UserWithRole } from "@/types/user-with-role"
+import type { UserType } from "@/types/user-type"
 import { PermissionGate } from "@/components/PermissionGate"
 import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
 
-const assignRoleFormSchema = z.object({
-  userRoleId: z.number().int().positive(),
+const assignUserTypeFormSchema = z.object({
+  userTypeId: z.number().int().positive(),
 })
 
-type AssignRoleFormValues = z.infer<typeof assignRoleFormSchema>
+type AssignUserTypeFormValues = z.infer<typeof assignUserTypeFormSchema>
 
 function displayName(user: UserWithRole) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "—"
 }
 
-type AssignRoleDialogProps = {
+type AssignUserTypeDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   user: UserWithRole | null
-  roles: UserRoleRecord[]
-  rolesLoading: boolean
-  rolesErrored: boolean
+  userTypes: UserType[]
+  userTypesLoading: boolean
+  userTypesErrored: boolean
   onAssigned: () => Promise<void>
 }
 
-export function AssignRoleDialog({
+export function AssignUserTypeDialog({
   open,
   onOpenChange,
   user,
-  roles,
-  rolesLoading,
-  rolesErrored,
+  userTypes,
+  userTypesLoading,
+  userTypesErrored,
   onAssigned,
-}: AssignRoleDialogProps) {
-  const form = useForm<AssignRoleFormValues>({
-    resolver: zodResolver(assignRoleFormSchema),
+}: AssignUserTypeDialogProps) {
+  const form = useForm<AssignUserTypeFormValues>({
+    resolver: zodResolver(assignUserTypeFormSchema),
     defaultValues: {
-      userRoleId: undefined,
+      userTypeId: undefined,
     },
   })
 
   React.useEffect(() => {
     if (open && user) {
-      // Find the role ID from the role name if available
-      const currentRoleId = roles.find((r) => r.userRole === user.userRole)?.userRoleId
+      const currentTypeId =
+        user.userTypeId != null
+          ? userTypes.find((t) => t.userTypeId === user.userTypeId)?.userTypeId
+          : undefined
+      const fallbackTypeId = userTypes[0]?.userTypeId
       form.reset({
-        userRoleId: currentRoleId,
+        userTypeId: currentTypeId ?? fallbackTypeId,
       })
     } else {
       form.reset()
     }
-  }, [open, user, roles, form])
+  }, [open, user, userTypes, form])
 
-  const onSubmit = async (data: AssignRoleFormValues) => {
+  const onSubmit = async (data: AssignUserTypeFormValues) => {
     if (!user) return
     try {
       await patchUserRole(user.userId, {
-        userRoleId: data.userRoleId,
+        userTypeId: data.userTypeId,
       })
       await onAssigned()
       onOpenChange(false)
     } catch (error) {
-      console.error("Assign role error:", error)
+      console.error("Assign user type error:", error)
     }
   }
 
@@ -101,17 +104,17 @@ export function AssignRoleDialog({
   }
 
   const canSubmit =
-    !rolesLoading && !rolesErrored && roles.length > 0 && user !== null
+    !userTypesLoading && !userTypesErrored && userTypes.length > 0 && user !== null
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Assign Role</DialogTitle>
+          <DialogTitle>Assign user type</DialogTitle>
           <DialogDescription>
             {user
-              ? `Select a role for ${displayName(user)} (${user.email}).`
-              : "Select a role for this user."}
+              ? `Update user type for ${displayName(user)} (${user.email}).`
+              : "Select a user type for this user."}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,23 +122,19 @@ export function AssignRoleDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="userRoleId"
+              name="userTypeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel>User type</FormLabel>
 
-                  {rolesLoading ? (
-                    <p className="text-sm text-muted-foreground">
-                      Loading roles…
-                    </p>
-                  ) : rolesErrored ? (
+                  {userTypesLoading ? (
+                    <p className="text-sm text-muted-foreground">Loading user types…</p>
+                  ) : userTypesErrored ? (
                     <p className="text-sm text-destructive">
-                      Could not load roles. Refresh the page and try again.
+                      Could not load user types. Refresh the page and try again.
                     </p>
-                  ) : roles.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No roles available.
-                    </p>
+                  ) : userTypes.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No user types available.</p>
                   ) : (
                     <Select
                       value={String(field.value ?? "")}
@@ -144,17 +143,14 @@ export function AssignRoleDialog({
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a role" />
+                          <SelectValue placeholder="Select a user type" />
                         </SelectTrigger>
                       </FormControl>
 
                       <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem
-                            key={role.userRoleId}
-                            value={String(role.userRoleId)}
-                          >
-                            {role.userRole}
+                        {userTypes.map((ut) => (
+                          <SelectItem key={ut.userTypeId} value={String(ut.userTypeId)}>
+                            {ut.userType}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -181,7 +177,7 @@ export function AssignRoleDialog({
                   type="submit"
                   disabled={form.formState.isSubmitting || !canSubmit}
                 >
-                  {form.formState.isSubmitting ? "Assigning..." : "Assign"}
+                  {form.formState.isSubmitting ? "Saving..." : "Save"}
                 </Button>
               </PermissionGate>
             </DialogFooter>

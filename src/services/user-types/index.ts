@@ -1,30 +1,56 @@
 import http from "@/utils/http";
-import type { UserTypesResponse, UserTypeResponse, CreateUserTypeBody, UpdateUserTypeBody, UserType } from "@/types/user-type";
+import { userTypes as userTypesEndpoints } from "@/constants/endpoints";
+import {
+  normalizeUserTypeFromApi,
+  type UserTypesApiResponse,
+  type UserTypeResponse,
+  type UserTypeApiRow,
+  type UserTypeUpsertApiBody,
+  type CreateUserTypeResponse,
+  type UpdateUserTypeResponse,
+  type UserTypeFormSubmitValues,
+} from "@/types/user-type";
 
-// TODO: Add user-types endpoints to endpoints.ts when backend is ready
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-export const getUserTypes = () => {
-  // TODO: Implement when backend endpoint is ready
-  return http.get<UserTypesResponse>(`${apiBaseUrl}/user-types`);
-};
+function mapUserTypeResponse(response: { data: { userType: UserTypeApiRow } }) {
+  return {
+    ...response,
+    data: {
+      userType: normalizeUserTypeFromApi(response.data.userType),
+    } satisfies UserTypeResponse,
+  };
+}
 
-export const getUserTypeById = (userTypeId: number) => {
-  // TODO: Implement when backend endpoint is ready
-  return http.get<UserTypeResponse>(`${apiBaseUrl}/user-types/${userTypeId}`);
-};
+function toUpsertBody(values: UserTypeFormSubmitValues): UserTypeUpsertApiBody {
+  return {
+    typeName: values.userType,
+    permissionsJson: values.permissions,
+  };
+}
 
-export const createUserType = (data: CreateUserTypeBody) => {
-  // TODO: Implement when backend endpoint is ready
-  return http.post<UserTypeResponse>(`${apiBaseUrl}/user-types`, data);
-};
+export const getUserTypes = () =>
+  http.get<UserTypesApiResponse>(`${apiBaseUrl}${userTypesEndpoints.getAll()}`).then((response) => ({
+    ...response,
+    data: {
+      userTypes: (response.data?.userTypes ?? []).map((row) => normalizeUserTypeFromApi(row)),
+    },
+  }));
 
-export const updateUserType = (userTypeId: number, data: UpdateUserTypeBody) => {
-  // TODO: Implement when backend endpoint is ready
-  return http.patch<UserTypeResponse>(`${apiBaseUrl}/user-types/${userTypeId}`, data);
-};
+export const getUserTypeById = (userTypeId: number) =>
+  http
+    .get<{ userType: UserTypeApiRow }>(`${apiBaseUrl}${userTypesEndpoints.getById(userTypeId)}`)
+    .then(mapUserTypeResponse);
 
-export const deleteUserType = (userTypeId: number) => {
-  // TODO: Implement when backend endpoint is ready
-  return http.delete(`${apiBaseUrl}/user-types/${userTypeId}`);
-};
+export const createUserType = (values: UserTypeFormSubmitValues) =>
+  http.post<CreateUserTypeResponse>(`${apiBaseUrl}${userTypesEndpoints.create()}`, {
+    data: toUpsertBody(values),
+  });
+
+export const updateUserType = (userTypeId: number, values: UserTypeFormSubmitValues) =>
+  http.put<UpdateUserTypeResponse>(`${apiBaseUrl}${userTypesEndpoints.putById(userTypeId)}`, {
+    data: toUpsertBody(values),
+  });
+
+export const deleteUserType = (userTypeId: number) =>
+  http.delete(`${apiBaseUrl}${userTypesEndpoints.deleteById(userTypeId)}`);

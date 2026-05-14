@@ -1,5 +1,8 @@
 export type JwtPayload = {
   exp?: number;
+  permissions?: string[];
+  /** Legacy/alternate claim shape */
+  permissionsJson?: string | string[];
   [key: string]: unknown;
 };
 

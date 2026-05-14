@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useFetchData from "@/hooks/use-fetch-data"
 import getUsersWithNoRole from "@/services/users/users-with-no-role"
-import getUserRoles from "@/services/users/get-user-roles"
+import { getUserTypes } from "@/services/user-types"
 import type { UserWithNoRole } from "@/types/user-with-no-role"
 import { Loader2Icon, TriangleAlertIcon } from "lucide-react"
 import { ApproveUserDialog } from "./approve-user-dialog"
@@ -36,8 +36,8 @@ export default function PendingUsersPage() {
     []
   )
 
-  const [rolesLoading, rolesErrored, rolesData] = useFetchData(
-    () => getUserRoles(),
+  const [typesLoading, typesErrored, typesData] = useFetchData(
+    () => getUserTypes(),
     []
   )
 
@@ -46,16 +46,16 @@ export default function PendingUsersPage() {
     return <PermissionProtectedPage />
   }
 
-  if (loading || rolesLoading) {
+  if (loading || typesLoading) {
     return <Loader2Icon className="size-4 animate-spin" />
   }
 
-  if (errored || rolesErrored) {
+  if (errored || typesErrored) {
     return <TriangleAlertIcon className="size-4 text-destructive" />
   }
 
-  const users = usersData.users ?? []
-  const roles = rolesData.userRoles ?? []
+  const users = usersData?.users ?? []
+  const userTypes = typesData?.userTypes ?? []
 
   const filteredData = users.filter(
     (item: UserWithNoRole) =>
@@ -204,9 +204,9 @@ export default function PendingUsersPage() {
           if (!open) dismissDialog()
         }}
         user={approveUser}
-        roles={roles}
-        rolesLoading={rolesLoading}
-        rolesErrored={rolesErrored}
+        userTypes={userTypes}
+        userTypesLoading={typesLoading}
+        userTypesErrored={typesErrored}
         onApproved={handleAfterApprove}
       />
 

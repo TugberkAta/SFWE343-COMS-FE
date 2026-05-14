@@ -29,13 +29,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import postApproveUser from "@/services/users/post-approve-user"
-import type { UserRoleRecord } from "@/types/user-role"
 import type { UserWithNoRole } from "@/types/user-with-no-role"
+import type { UserType } from "@/types/user-type"
 import { PermissionGate } from "@/components/PermissionGate"
 import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
 
 const approveFormSchema = z.object({
-  userRoleId: z.number().int().positive(),
+  userTypeId: z.number().int().positive(),
 })
 
 type ApproveFormValues = z.infer<typeof approveFormSchema>
@@ -48,9 +48,9 @@ type ApproveUserDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   user: UserWithNoRole | null
-  roles: UserRoleRecord[]
-  rolesLoading: boolean
-  rolesErrored: boolean
+  userTypes: UserType[]
+  userTypesLoading: boolean
+  userTypesErrored: boolean
   onApproved: () => Promise<void>
 }
 
@@ -58,23 +58,25 @@ export function ApproveUserDialog({
   open,
   onOpenChange,
   user,
-  roles,
-  rolesLoading,
-  rolesErrored,
+  userTypes,
+  userTypesLoading,
+  userTypesErrored,
   onApproved,
 }: ApproveUserDialogProps) {
-  const firstRoleId = roles[0]?.userRoleId
+  const firstTypeId = userTypes[0]?.userTypeId
 
   const form = useForm<ApproveFormValues>({
     resolver: zodResolver(approveFormSchema),
-    defaultValues: { userRoleId: firstRoleId ?? 0 },
+    defaultValues: {
+      userTypeId: firstTypeId ?? 0,
+    },
   })
 
   React.useEffect(() => {
-    if (open && firstRoleId !== undefined) {
-      form.reset({ userRoleId: firstRoleId })
+    if (open && firstTypeId !== undefined) {
+      form.reset({ userTypeId: firstTypeId })
     }
-  }, [open, user?.userId, firstRoleId, form])
+  }, [open, user?.userId, firstTypeId, form])
 
   const handleDismiss = () => {
     if (form.formState.isSubmitting) return
@@ -87,7 +89,7 @@ export function ApproveUserDialog({
     try {
       await postApproveUser({
         userId: user.userId,
-        userRoleId: values.userRoleId,
+        userTypeId: values.userTypeId,
         approvedStatus: true,
       })
 
@@ -98,10 +100,7 @@ export function ApproveUserDialog({
   })
 
   const canSubmit =
-    !rolesLoading &&
-    !rolesErrored &&
-    roles.length > 0 &&
-    user !== null
+    !userTypesLoading && !userTypesErrored && userTypes.length > 0 && user !== null
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
@@ -110,8 +109,8 @@ export function ApproveUserDialog({
           <DialogTitle>Approve user</DialogTitle>
           <DialogDescription>
             {user
-              ? `Select a role for ${displayName(user)} (${user.email}) before approving.`
-              : "Select a role before approving this user."}
+              ? `Choose a user type for ${displayName(user)} (${user.email}) before approving.`
+              : "Choose a user type before approving this user."}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,23 +118,19 @@ export function ApproveUserDialog({
           <form onSubmit={onSubmit} className="space-y-4">
             <FormField
               control={form.control}
-              name="userRoleId"
+              name="userTypeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel>User type</FormLabel>
 
-                  {rolesLoading ? (
-                    <p className="text-sm text-muted-foreground">
-                      Loading roles…
-                    </p>
-                  ) : rolesErrored ? (
+                  {userTypesLoading ? (
+                    <p className="text-sm text-muted-foreground">Loading user types…</p>
+                  ) : userTypesErrored ? (
                     <p className="text-sm text-destructive">
-                      Could not load roles. Refresh the page and try again.
+                      Could not load user types. Refresh the page and try again.
                     </p>
-                  ) : roles.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No roles available.
-                    </p>
+                  ) : userTypes.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No user types available.</p>
                   ) : (
                     <Select
                       value={String(field.value)}
@@ -144,17 +139,14 @@ export function ApproveUserDialog({
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a role" />
+                          <SelectValue placeholder="Select a user type" />
                         </SelectTrigger>
                       </FormControl>
 
                       <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem
-                            key={role.userRoleId}
-                            value={String(role.userRoleId)}
-                          >
-                            {role.userRole}
+                        {userTypes.map((ut) => (
+                          <SelectItem key={ut.userTypeId} value={String(ut.userTypeId)}>
+                            {ut.userType}
                           </SelectItem>
                         ))}
                       </SelectContent>

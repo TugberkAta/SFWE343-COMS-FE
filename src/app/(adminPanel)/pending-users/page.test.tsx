@@ -12,8 +12,8 @@ vi.mock("@/services/users/users-with-no-role", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("@/services/users/get-user-roles", () => ({
-  default: vi.fn(),
+vi.mock("@/services/user-types", () => ({
+  getUserTypes: vi.fn(),
 }));
 
 vi.mock("@/services/users/post-approve-user", () => ({
@@ -25,8 +25,6 @@ vi.mock("@/services/users/post-reject-user", () => ({
 }));
 
 import useFetchData from "@/hooks/use-fetch-data";
-import getUsersWithNoRole from "@/services/users/users-with-no-role";
-import getUserRoles from "@/services/users/get-user-roles";
 import postApproveUser from "@/services/users/post-approve-user";
 import postRejectUser from "@/services/users/post-reject-user";
 
@@ -49,9 +47,9 @@ const mockUsers: import("@/types/user-with-no-role").UserWithNoRole[] = [
   },
 ];
 
-const mockRoles: import("@/types/user-role").UserRoleRecord[] = [
-  { userRoleId: 1, userRole: "Admin" },
-  { userRoleId: 2, userRole: "Teacher" },
+const mockUserTypes: import("@/types/user-type").UserType[] = [
+  { userTypeId: 1, userType: "staff_member", permissions: [] },
+  { userTypeId: 2, userType: "admin_type", permissions: [] },
 ];
 
 let mockCallCount = 0;
@@ -60,18 +58,17 @@ function setupMocks({
   usersLoading = false,
   usersErrored = false,
   usersData = { users: mockUsers },
-  rolesLoading = false,
-  rolesErrored = false,
-  rolesData = { userRoles: mockRoles },
+  typesLoading = false,
+  typesErrored = false,
+  typesData = { userTypes: mockUserTypes },
 } = {}) {
   mockCallCount = 0;
-  vi.mocked(useFetchData).mockImplementation((fetcher) => {
+  vi.mocked(useFetchData).mockImplementation(() => {
     mockCallCount++;
-    // First call is for users, second call is for roles
     if (mockCallCount === 1) {
       return [usersLoading, usersErrored, usersData, vi.fn()] as const;
     }
-    return [rolesLoading, rolesErrored, rolesData, vi.fn()] as const;
+    return [typesLoading, typesErrored, typesData, vi.fn()] as const;
   });
 }
 
@@ -99,16 +96,14 @@ describe("PendingUsersPage", () => {
 
   it("shows loading state for users", () => {
     setupMocks({ usersLoading: true });
-    renderPage();
-    expect(screen.getByText("Loading users…")).toBeInTheDocument();
+    const { container } = renderPage();
+    expect(container.querySelector(".animate-spin")).toBeTruthy();
   });
 
   it("shows error state for users", () => {
     setupMocks({ usersErrored: true });
-    renderPage();
-    expect(
-      screen.getByText(/Could not load users/i),
-    ).toBeInTheDocument();
+    const { container } = renderPage();
+    expect(container.querySelector(".text-destructive")).toBeTruthy();
   });
 
   it("displays users in the table", () => {
@@ -178,7 +173,7 @@ describe("PendingUsersPage", () => {
     await user.click(approveButton);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText(/Select a role for John Doe/i)).toBeInTheDocument();
+    expect(screen.getByText(/Choose a user type for John Doe/i)).toBeInTheDocument();
   });
 
   it("opens reject dialog when reject button is clicked", async () => {
@@ -195,12 +190,13 @@ describe("PendingUsersPage", () => {
   it("calls postApproveUser and refetches when user is approved", async () => {
     const user = userEvent.setup();
     const refetch = vi.fn();
-    vi.mocked(useFetchData).mockImplementation((fetcher, initial) => {
-      if (fetcher.toString().includes("getUsersWithNoRole")) {
+    vi.mocked(useFetchData).mockImplementation((fetcher) => {
+      const src = fetcher?.toString() ?? "";
+      if (src.includes("getUsersWithNoRole")) {
         return [false, false, { users: mockUsers }, refetch] as const;
       }
-      if (fetcher.toString().includes("getUserRoles")) {
-        return [false, false, { userRoles: mockRoles }, vi.fn()] as const;
+      if (src.includes("getUserTypes")) {
+        return [false, false, { userTypes: mockUserTypes }, vi.fn()] as const;
       }
       return [false, false, null, vi.fn()] as const;
     });
@@ -218,7 +214,7 @@ describe("PendingUsersPage", () => {
     await waitFor(() => {
       expect(postApproveUser).toHaveBeenCalledWith({
         userId: 1,
-        userRoleId: 1,
+        userTypeId: 1,
         approvedStatus: true,
       });
       expect(refetch).toHaveBeenCalled();
@@ -228,12 +224,13 @@ describe("PendingUsersPage", () => {
   it("calls postRejectUser and refetches when user is rejected", async () => {
     const user = userEvent.setup();
     const refetch = vi.fn();
-    vi.mocked(useFetchData).mockImplementation((fetcher, initial) => {
-      if (fetcher.toString().includes("getUsersWithNoRole")) {
+    vi.mocked(useFetchData).mockImplementation((fetcher) => {
+      const src = fetcher?.toString() ?? "";
+      if (src.includes("getUsersWithNoRole")) {
         return [false, false, { users: mockUsers }, refetch] as const;
       }
-      if (fetcher.toString().includes("getUserRoles")) {
-        return [false, false, { userRoles: mockRoles }, vi.fn()] as const;
+      if (src.includes("getUserTypes")) {
+        return [false, false, { userTypes: mockUserTypes }, vi.fn()] as const;
       }
       return [false, false, null, vi.fn()] as const;
     });

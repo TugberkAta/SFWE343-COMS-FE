@@ -59,7 +59,7 @@ const CoursesPage = () => {
   }, [setBreadcrumbItem]);
 
   // 🔥 PAGE PROTECTION
-  if (!hasPermission(ENDPOINT_PERMISSIONS.courses.READ)) {
+  if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
     return <PermissionProtectedPage />;
   }
 

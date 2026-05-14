@@ -47,7 +47,7 @@ const FacultiesPage = () => {
   }, [setBreadcrumbItem]);
 
   // 🔥 PAGE PROTECTION
-  if (!hasPermission(ENDPOINT_PERMISSIONS.departments.READ)) {
+  if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
     return <PermissionProtectedPage />;
   }
 
