@@ -154,14 +154,13 @@ vi.mock("react-hook-form", () => ({
       weeklyTopics: [
         {
           weekNo: 1,
-          weekDate: null,
           subjectTitle: "",
           detailsText: "",
           tasksPrivateStudyText: "",
           clos: [],
         },
       ],
-      evaluationItems: [{ title: "", count: 1, weight: 0, clos: [] }],
+      evaluationItems: [{ title: "", count: 1, weight: 0 }],
       workloadItems: [{ activity: "", hours: 0 }],
     }),
     clearErrors: vi.fn(),

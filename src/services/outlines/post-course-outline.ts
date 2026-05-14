@@ -25,7 +25,6 @@ type OutlineWeeklyTopicCloPayload = {
 
 type OutlineWeeklyTopicPayload = {
   weekNo: number;
-  weekDate: string | null;
   subjectTitle: string;
   detailsText: string;
   tasksPrivateStudyText: string;
@@ -37,15 +36,10 @@ type OutlineWorkloadItemPayload = {
   hours: number;
 };
 
-type OutlineEvaluationItemCloPayload = {
-  cloCode: string;
-};
-
 type OutlineEvaluationItemPayload = {
   title: string;
   count: number;
   weight: number;
-  clos: OutlineEvaluationItemCloPayload[];
 };
 
 export type PostCourseOutlineBody = {

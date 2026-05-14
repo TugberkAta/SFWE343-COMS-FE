@@ -190,9 +190,6 @@ export default function TeacherOutlineDetailsPage() {
               <p className="text-sm font-medium">{renderEmpty(item.name)}</p>
               <p className={keyValueClassName}>Weight: {item.weightPercent}%</p>
               <p className={keyValueClassName}>Count: {item.count}</p>
-              <p className={keyValueClassName}>
-                CLOs: {(item.clos || []).length ? item.clos.map((clo) => `CLO-${clo.cloNumber}`).join(", ") : "-"}
-              </p>
             </div>
           ))}
         </CardContent>

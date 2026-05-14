@@ -27,7 +27,6 @@ export type OutlineWeeklyTopicClo = {
 export type OutlineWeeklyTopic = {
   weeklyTopicId: number;
   weekNo: number;
-  weekDate: string | null;
   subjectTitle: string;
   detailsText: string;
   tasksPrivateStudyText: string;
@@ -56,11 +55,6 @@ export type OutlineWorkloadItem = {
   durationHours: number;
 };
 
-export type OutlineEvaluationItemClo = {
-  cloId: number;
-  cloNumber: string;
-};
-
 export type OutlineEvaluationItem = {
   evaluationItemId: number;
   itemOrder: number;
@@ -69,7 +63,6 @@ export type OutlineEvaluationItem = {
   count: number;
   weightPercent: number;
   notes: string;
-  clos: OutlineEvaluationItemClo[];
 };
 
 export type ProgramLearningOutcome = {

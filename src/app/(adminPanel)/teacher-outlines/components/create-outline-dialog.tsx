@@ -1,7 +1,21 @@
 "use client";
 
-import { type ChangeEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Circle, FileText, Plus, Trash2 } from "lucide-react";
+import {
+  type ChangeEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  Circle,
+  FileText,
+  Plus,
+  Trash2,
+  TriangleAlertIcon,
+} from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -44,7 +58,11 @@ import RichTextEditor from "@/components/ui/rich-text-editor";
 import useFetchData from "@/hooks/use-fetch-data";
 import Authentication from "@/services/auth/authentication";
 import { getCourses, type Course } from "@/services/courses";
-import { getOutlineById, patchCourseOutline, postCourseOutline } from "@/services/outlines";
+import {
+  getOutlineById,
+  patchCourseOutline,
+  postCourseOutline,
+} from "@/services/outlines";
 import type { OutlineById } from "@/services/outlines/get-outline-by-id";
 import type { PostCourseOutlineBody } from "@/services/outlines/post-course-outline";
 import type { PatchCourseOutlineBody } from "@/services/outlines/patch-course-outline";
@@ -75,13 +93,35 @@ const WORKLOAD_ECTS_SLACK = 1.0;
 const richTextPreviewClassName =
   "max-w-none text-sm text-gray-300 [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1";
 
+function stripHtmlToPlainText(html: string): string {
+  if (!html?.trim()) return "";
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function truncateCloDescriptionPreview(text: string, maxChars = 40): string {
+  const t = text.trim();
+  if (!t) return "";
+  if (t.length <= maxChars) return t;
+  const cut = t.slice(0, maxChars);
+  const lastSpace = cut.lastIndexOf(" ");
+  const base = lastSpace > 10 ? cut.slice(0, lastSpace) : cut.trimEnd();
+  return `${base.trim()}..`;
+}
+
 type CreateOutlineDialogProps = {
   courseId: number;
   outlineId?: number;
   trigger?: ReactNode;
 };
 
-export default function CreateOutlineDialog({ courseId, outlineId, trigger }: CreateOutlineDialogProps) {
+export default function CreateOutlineDialog({
+  courseId,
+  outlineId,
+  trigger,
+}: CreateOutlineDialogProps) {
   const auth = useMemo(() => new Authentication(), []);
   const currentUser = useMemo(() => auth.getCurrentUser(), [auth]);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -91,17 +131,22 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
 
   const [loadingUsers, usersError, usersData] = useFetchData(
     () => getUsersWithRole(),
-    []
+    [],
   );
   const [loadingCourses, coursesError, coursesData] = useFetchData(getCourses);
   const weeklyTopicsCsvInputRef = useRef<HTMLInputElement | null>(null);
-  const [isWeeklyTopicsCsvDialogOpen, setIsWeeklyTopicsCsvDialogOpen] = useState(false);
-  const [weeklyTopicsCsvFile, setWeeklyTopicsCsvFile] = useState<File | null>(null);
-  const [weeklyTopicsCsvDialogError, setWeeklyTopicsCsvDialogError] = useState<string | null>(null);
+  const [isWeeklyTopicsCsvDialogOpen, setIsWeeklyTopicsCsvDialogOpen] =
+    useState(false);
+  const [weeklyTopicsCsvFile, setWeeklyTopicsCsvFile] = useState<File | null>(
+    null,
+  );
+  const [weeklyTopicsCsvDialogError, setWeeklyTopicsCsvDialogError] = useState<
+    string | null
+  >(null);
   const [, , outlineData] = useFetchData(
     () => getOutlineById(Number(outlineId)),
     [outlineId],
-    { enabled: isUpdateMode }
+    { enabled: isUpdateMode },
   );
 
   const terms: Term[] = termsData.terms || [];
@@ -113,21 +158,27 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         value: String(term.termId),
         label: `${term.academicYear} - ${term.semester}`,
       })),
-    [terms]
+    [terms],
   );
   const approvedUserOptions = useMemo(
     () =>
       approvedUsers.map((user) => ({
         value: String(user.userId),
-        label: [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || user.email,
+        label:
+          [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
+          user.email,
       })),
-    [approvedUsers]
+    [approvedUsers],
   );
   const existingOutline = outlineData?.outline as OutlineById | undefined;
 
   const toOutlineFormValues = (outline: OutlineById): PostCourseOutlineBody => {
-    const outlineWithAssistants = outline as OutlineById & { assistantUserIds?: number[] };
-    const normalizedAssistantUserIds = Array.isArray(outlineWithAssistants.assistantUserIds)
+    const outlineWithAssistants = outline as OutlineById & {
+      assistantUserIds?: number[];
+    };
+    const normalizedAssistantUserIds = Array.isArray(
+      outlineWithAssistants.assistantUserIds,
+    )
       ? outlineWithAssistants.assistantUserIds
       : outline.assistantUserId
         ? [outline.assistantUserId]
@@ -144,10 +195,14 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       officeCode: outline.officeCode || "",
       createdByUserId: currentUser?.userId ?? outline.createdByUserId ?? 0,
       objectives: outline.objectives?.length
-        ? outline.objectives.map((item) => ({ description: item.objectiveText || "" }))
+        ? outline.objectives.map((item) => ({
+            description: item.objectiveText || "",
+          }))
         : [{ description: "" }],
       contentItems: outline.contentItems?.length
-        ? outline.contentItems.map((item) => ({ description: item.contentText || "" }))
+        ? outline.contentItems.map((item) => ({
+            description: item.contentText || "",
+          }))
         : [{ description: "" }],
       learningOutcomes:
         outline.learningOutcomes?.length >= MIN_CLO_COUNT
@@ -161,11 +216,16 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 description: item.statement || "",
               })),
               ...Array.from(
-                { length: Math.max(MIN_CLO_COUNT - (outline.learningOutcomes?.length || 0), 0) },
+                {
+                  length: Math.max(
+                    MIN_CLO_COUNT - (outline.learningOutcomes?.length || 0),
+                    0,
+                  ),
+                },
                 (_, index) => ({
                   cloCode: `CLO-${(outline.learningOutcomes?.length || 0) + index + 1}`,
                   description: "",
-                })
+                }),
               ),
             ],
       programLearningOutcomes: outline.programLearningOutcomes?.length
@@ -177,16 +237,16 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       weeklyTopics: outline.weeklyTopics?.length
         ? outline.weeklyTopics.map((item, index) => ({
             weekNo: item.weekNo || index + 1,
-            weekDate: item.weekDate,
             subjectTitle: item.subjectTitle || "",
             detailsText: item.detailsText || "",
             tasksPrivateStudyText: item.tasksPrivateStudyText || "",
-            clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
+            clos: (item.clos || []).map((clo) => ({
+              cloCode: `CLO-${clo.cloNumber}`,
+            })),
           }))
         : [
             {
               weekNo: 1,
-              weekDate: null,
               subjectTitle: "",
               detailsText: "",
               tasksPrivateStudyText: "",
@@ -204,9 +264,8 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
             title: item.name || "",
             count: item.count || 1,
             weight: item.weightPercent || 0,
-            clos: (item.clos || []).map((clo) => ({ cloCode: `CLO-${clo.cloNumber}` })),
           }))
-        : [{ title: "", count: 1, weight: 0, clos: [] }],
+        : [{ title: "", count: 1, weight: 0 }],
     };
   };
 
@@ -231,7 +290,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       weeklyTopics: [
         {
           weekNo: 1,
-          weekDate: null,
           subjectTitle: "",
           detailsText: "",
           tasksPrivateStudyText: "",
@@ -239,32 +297,41 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         },
       ],
       workloadItems: [{ activity: "", hours: 0 }],
-      evaluationItems: [{ title: "", count: 1, weight: 0, clos: [] }],
+      evaluationItems: [{ title: "", count: 1, weight: 0 }],
     },
   });
 
-  const getAssessmentWeightTotal = (evaluationItems: PostCourseOutlineBody["evaluationItems"]) =>
-    evaluationItems.reduce((sum, item) => sum + Number(item.weight || 0), 0);
+  const getAssessmentWeightTotal = (
+    evaluationItems: PostCourseOutlineBody["evaluationItems"],
+  ) => evaluationItems.reduce((sum, item) => sum + Number(item.weight || 0), 0);
 
-  const isAssessmentWeightValid = (evaluationItems: PostCourseOutlineBody["evaluationItems"]) =>
-    Math.abs(getAssessmentWeightTotal(evaluationItems) - ASSESSMENT_WEIGHT_TARGET) < ASSESSMENT_WEIGHT_TOLERANCE;
+  const isAssessmentWeightValid = (
+    evaluationItems: PostCourseOutlineBody["evaluationItems"],
+  ) =>
+    Math.abs(
+      getAssessmentWeightTotal(evaluationItems) - ASSESSMENT_WEIGHT_TARGET,
+    ) < ASSESSMENT_WEIGHT_TOLERANCE;
   const selectedCourseId = form.watch("courseId");
   const selectedCourse = useMemo(
     () => courses.find((course) => course.courseId === selectedCourseId),
-    [courses, selectedCourseId]
+    [courses, selectedCourseId],
   );
   const selectedCourseEcts = selectedCourse?.ectsCredits;
-  const getWorkloadTotalHours = (workloadItems: PostCourseOutlineBody["workloadItems"]) =>
-    workloadItems.reduce((sum, item) => sum + Number(item.hours || 0), 0);
+  const getWorkloadTotalHours = (
+    workloadItems: PostCourseOutlineBody["workloadItems"],
+  ) => workloadItems.reduce((sum, item) => sum + Number(item.hours || 0), 0);
   const isWorkloadLimitValid = (
     workloadItems: PostCourseOutlineBody["workloadItems"],
-    ectsCredits?: number
+    ectsCredits?: number,
   ) => {
     if (!Number.isFinite(ectsCredits) || (ectsCredits ?? 0) <= 0) {
       return true;
     }
 
-    return getWorkloadTotalHours(workloadItems) / WORKLOAD_DIVISOR < (ectsCredits ?? 0) + WORKLOAD_ECTS_SLACK;
+    return (
+      getWorkloadTotalHours(workloadItems) / WORKLOAD_DIVISOR <
+      (ectsCredits ?? 0) + WORKLOAD_ECTS_SLACK
+    );
   };
 
   const renderRichText = (value?: string) => {
@@ -328,16 +395,22 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         .filter(Boolean);
 
       if (lines.length < 2) {
-        throw new Error("CSV must include a header row and at least one data row.");
+        throw new Error(
+          "CSV must include a header row and at least one data row.",
+        );
       }
 
-      const headers = parseCsvLine(lines[0]).map((header) => header.toLowerCase());
-      const getColumnIndex = (columnName: string) => headers.indexOf(columnName.toLowerCase());
+      const headers = parseCsvLine(lines[0]).map((header) =>
+        header.toLowerCase(),
+      );
+      const getColumnIndex = (columnName: string) =>
+        headers.indexOf(columnName.toLowerCase());
       const weekNoIndex = getColumnIndex("weekNo");
-      const weekDateIndex = getColumnIndex("weekDate");
       const subjectTitleIndex = getColumnIndex("subjectTitle");
       const detailsTextIndex = getColumnIndex("detailsText");
-      const tasksPrivateStudyTextIndex = getColumnIndex("tasksPrivateStudyText");
+      const tasksPrivateStudyTextIndex = getColumnIndex(
+        "tasksPrivateStudyText",
+      );
       const closIndex = getColumnIndex("clos");
 
       const requiredColumns = [
@@ -352,7 +425,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         .map(([columnName]) => columnName);
 
       if (missingColumns.length > 0) {
-        throw new Error(`Missing required CSV columns: ${missingColumns.join(", ")}.`);
+        throw new Error(
+          `Missing required CSV columns: ${missingColumns.join(", ")}.`,
+        );
       }
 
       const importedWeeklyTopics = lines.slice(1).map((line, rowIndex) => {
@@ -365,7 +440,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         const subjectTitle = values[subjectTitleIndex] ?? "";
         const detailsText = values[detailsTextIndex] ?? "";
         const tasksPrivateStudyText = values[tasksPrivateStudyTextIndex] ?? "";
-        const weekDateRaw = weekDateIndex >= 0 ? (values[weekDateIndex] ?? "") : "";
         const closRaw = closIndex >= 0 ? (values[closIndex] ?? "") : "";
 
         const clos = closRaw
@@ -376,7 +450,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
 
         return {
           weekNo,
-          weekDate: weekDateRaw || null,
           subjectTitle,
           detailsText,
           tasksPrivateStudyText,
@@ -391,11 +464,15 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
       replaceWeeklyTopics(importedWeeklyTopics);
       form.clearErrors("weeklyTopics");
     } catch (error) {
-      throw error instanceof Error ? error : new Error("Failed to import weekly topics CSV.");
+      throw error instanceof Error
+        ? error
+        : new Error("Failed to import weekly topics CSV.");
     }
   };
 
-  const handleWeeklyTopicsCsvFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleWeeklyTopicsCsvFileChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -406,7 +483,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
 
   const handleWeeklyTopicsCsvImportSubmit = async () => {
     if (!weeklyTopicsCsvFile) {
-      setWeeklyTopicsCsvDialogError("Please choose a CSV file before importing.");
+      setWeeklyTopicsCsvDialogError(
+        "Please choose a CSV file before importing.",
+      );
       return;
     }
 
@@ -419,7 +498,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         weeklyTopicsCsvInputRef.current.value = "";
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to import weekly topics CSV.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to import weekly topics CSV.";
       setWeeklyTopicsCsvDialogError(message);
       form.setError("weeklyTopics", {
         type: "manual",
@@ -428,11 +510,19 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     }
   };
 
-  const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
+  const {
+    fields: objectiveFields,
+    append: appendObjective,
+    remove: removeObjective,
+  } = useFieldArray({
     control: form.control,
     name: "objectives",
   });
-  const { fields: contentItemFields, append: appendContentItem, remove: removeContentItem } = useFieldArray({
+  const {
+    fields: contentItemFields,
+    append: appendContentItem,
+    remove: removeContentItem,
+  } = useFieldArray({
     control: form.control,
     name: "contentItems",
   });
@@ -469,7 +559,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
     control: form.control,
     name: "evaluationItems",
   });
-  const { fields: workloadItemFields, append: appendWorkloadItem, remove: removeWorkloadItem } = useFieldArray({
+  const {
+    fields: workloadItemFields,
+    append: appendWorkloadItem,
+    remove: removeWorkloadItem,
+  } = useFieldArray({
     control: form.control,
     name: "workloadItems",
   });
@@ -479,7 +573,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
   }, [courseId, form]);
 
   useEffect(() => {
-    form.setValue("createdByUserId", currentUser?.userId ?? 0, { shouldValidate: true });
+    form.setValue("createdByUserId", currentUser?.userId ?? 0, {
+      shouldValidate: true,
+    });
   }, [currentUser?.userId, form]);
 
   useEffect(() => {
@@ -500,10 +596,14 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
 
   useEffect(() => {
     programLearningOutcomeFields.forEach((_, index) => {
-      form.setValue(`programLearningOutcomes.${index}.ploCode`, `PLO-${index + 1}`, {
-        shouldValidate: false,
-        shouldDirty: false,
-      });
+      form.setValue(
+        `programLearningOutcomes.${index}.ploCode`,
+        `PLO-${index + 1}`,
+        {
+          shouldValidate: false,
+          shouldDirty: false,
+        },
+      );
     });
   }, [form, programLearningOutcomeFields]);
 
@@ -524,7 +624,43 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
 
   const cloOptions = useMemo(
     () => learningOutcomeFields.map((_, index) => `CLO-${index + 1}`),
-    [learningOutcomeFields]
+    [learningOutcomeFields],
+  );
+
+  const watchedLearningOutcomes = form.watch("learningOutcomes");
+  const watchedWeeklyTopics = form.watch("weeklyTopics");
+
+  const unusedWeeklyPlanClos = useMemo(() => {
+    const normalizeClo = (code: string) => code.trim().toUpperCase();
+    const definedCodes = watchedLearningOutcomes
+      .map((lo) => lo.cloCode)
+      .filter((c): c is string => Boolean(c?.trim()))
+      .map(normalizeClo);
+    const definedUnique = [...new Set(definedCodes)];
+
+    const usedCodes = new Set<string>();
+    for (const topic of watchedWeeklyTopics ?? []) {
+      for (const entry of topic.clos ?? []) {
+        const raw = entry.cloCode;
+        if (raw?.trim()) usedCodes.add(normalizeClo(raw));
+      }
+    }
+
+    return definedUnique.filter((code) => !usedCodes.has(code));
+  }, [watchedLearningOutcomes, watchedWeeklyTopics]);
+
+  const formatCloComboboxLabel = useCallback(
+    (cloCode: string) => {
+      const trimmed = cloCode.trim();
+      const normalized = trimmed.toUpperCase();
+      const outcome = watchedLearningOutcomes.find(
+        (lo) => lo.cloCode?.trim().toUpperCase() === normalized,
+      );
+      const plain = stripHtmlToPlainText(outcome?.description ?? "");
+      if (!plain) return trimmed;
+      return `${trimmed} - "${truncateCloDescriptionPreview(plain)}"`;
+    },
+    [watchedLearningOutcomes],
   );
 
   const tabs = useMemo(
@@ -534,7 +670,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         icon: FileText,
         onClick: () => setActiveTabIndex(index),
       })),
-    []
+    [],
   );
 
   const goToNextTab = async () => {
@@ -546,8 +682,14 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         "status",
         "lecturerUserId",
       ],
-      "Content & Objectives": ["objectives.0.description", "contentItems.0.description"],
-      "Learning Outcomes (CLOs)": ["learningOutcomes.0.cloCode", "learningOutcomes.0.description"],
+      "Content & Objectives": [
+        "objectives.0.description",
+        "contentItems.0.description",
+      ],
+      "Learning Outcomes (CLOs)": [
+        "learningOutcomes.0.cloCode",
+        "learningOutcomes.0.description",
+      ],
       "Program Learning Outcomes (PLOs)": [
         "programLearningOutcomes.0.ploCode",
         "programLearningOutcomes.0.description",
@@ -563,18 +705,17 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         "evaluationItems.0.title",
         "evaluationItems.0.count",
         "evaluationItems.0.weight",
-        "evaluationItems.0.clos",
       ],
       Schedule: ["workloadItems.0.activity", "workloadItems.0.hours"],
-      Resources: [
-        "textbooksText",
-        "additionalReadingText",
-      ],
+      Resources: ["textbooksText", "additionalReadingText"],
       "Review & Publish": [],
     };
 
     const isValid = await form.trigger(fieldsToValidate[activeTab] as never);
-    if (activeTab === "Learning Outcomes (CLOs)" && learningOutcomeFields.length < MIN_CLO_COUNT) {
+    if (
+      activeTab === "Learning Outcomes (CLOs)" &&
+      learningOutcomeFields.length < MIN_CLO_COUNT
+    ) {
       form.setError("learningOutcomes", {
         type: "manual",
         message: `At least ${MIN_CLO_COUNT} CLOs are required.`,
@@ -676,7 +817,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                       disabled={loadingTerms}
                     >
                       <SelectTrigger className={`${inputClassName} w-full`}>
-                        <SelectValue placeholder={loadingTerms ? "Loading terms..." : "Select a term"} />
+                        <SelectValue
+                          placeholder={
+                            loadingTerms ? "Loading terms..." : "Select a term"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {termOptions.map((option) => (
@@ -688,7 +833,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     </Select>
                   </FormControl>
                   {termsError ? (
-                    <p className="text-sm text-red-400">Failed to load terms.</p>
+                    <p className="text-sm text-red-400">
+                      Failed to load terms.
+                    </p>
                   ) : null}
                   <FormMessage />
                 </FormItem>
@@ -704,9 +851,15 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   <FormControl>
                     <Combobox
                       items={approvedUserOptions}
-                      value={approvedUserOptions.find((option) => option.value === String(field.value))}
-                      onValueChange={(value) => field.onChange(value ? Number(value.value) : 0)}
-                      disabled={loadingUsers || approvedUserOptions.length === 0}
+                      value={approvedUserOptions.find(
+                        (option) => option.value === String(field.value),
+                      )}
+                      onValueChange={(value) =>
+                        field.onChange(value ? Number(value.value) : 0)
+                      }
+                      disabled={
+                        loadingUsers || approvedUserOptions.length === 0
+                      }
                     >
                       <ComboboxTrigger
                         render={
@@ -716,14 +869,22 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                             className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
                           >
                             <span className="truncate">
-                              {approvedUserOptions.find((option) => option.value === String(field.value))?.label ??
-                                (loadingUsers ? "Loading users..." : "Select lecturer")}
+                              {approvedUserOptions.find(
+                                (option) =>
+                                  option.value === String(field.value),
+                              )?.label ??
+                                (loadingUsers
+                                  ? "Loading users..."
+                                  : "Select lecturer")}
                             </span>
                           </Button>
                         }
                       />
                       <ComboboxContent>
-                        <ComboboxInput showTrigger={false} placeholder="Search lecturer..." />
+                        <ComboboxInput
+                          showTrigger={false}
+                          placeholder="Search lecturer..."
+                        />
                         <ComboboxEmpty>No users found.</ComboboxEmpty>
                         <ComboboxList>
                           {(item) => (
@@ -736,7 +897,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     </Combobox>
                   </FormControl>
                   {usersError ? (
-                    <p className="text-sm text-red-400">Failed to load approved users.</p>
+                    <p className="text-sm text-red-400">
+                      Failed to load approved users.
+                    </p>
                   ) : null}
                   <FormMessage />
                 </FormItem>
@@ -753,17 +916,25 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                       multiple
                       items={approvedUserOptions}
                       value={approvedUserOptions.filter((option) =>
-                        field.value.includes(Number(option.value))
+                        field.value.includes(Number(option.value)),
                       )}
                       onValueChange={(value) => {
-                        const selectedValues = Array.isArray(value) ? value : [];
+                        const selectedValues = Array.isArray(value)
+                          ? value
+                          : [];
                         const normalizedAssistantIds = selectedValues
-                          .map((item) => (typeof item === "string" ? Number(item) : Number(item.value)))
+                          .map((item) =>
+                            typeof item === "string"
+                              ? Number(item)
+                              : Number(item.value),
+                          )
                           .filter((id) => Number.isFinite(id) && id > 0);
 
                         field.onChange(normalizedAssistantIds);
                       }}
-                      disabled={loadingUsers || approvedUserOptions.length === 0}
+                      disabled={
+                        loadingUsers || approvedUserOptions.length === 0
+                      }
                     >
                       <ComboboxTrigger
                         render={
@@ -775,7 +946,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                             <span className="truncate">
                               {field.value.length > 0
                                 ? approvedUserOptions
-                                    .filter((option) => field.value.includes(Number(option.value)))
+                                    .filter((option) =>
+                                      field.value.includes(
+                                        Number(option.value),
+                                      ),
+                                    )
                                     .map((option) => option.label)
                                     .join(", ")
                                 : loadingUsers
@@ -786,7 +961,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                         }
                       />
                       <ComboboxContent>
-                        <ComboboxInput showTrigger={false} placeholder="Search assistants..." />
+                        <ComboboxInput
+                          showTrigger={false}
+                          placeholder="Search assistants..."
+                        />
                         <ComboboxEmpty>No users found.</ComboboxEmpty>
                         <ComboboxList>
                           {(item) => (
@@ -799,7 +977,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     </Combobox>
                   </FormControl>
                   {usersError ? (
-                    <p className="text-sm text-red-400">Failed to load approved users.</p>
+                    <p className="text-sm text-red-400">
+                      Failed to load approved users.
+                    </p>
                   ) : null}
                   <FormMessage />
                 </FormItem>
@@ -812,7 +992,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
           <div className="space-y-4">
             <div className="space-y-3 rounded-md border border-white/10 p-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Course Objectives</p>
+                <p className="text-sm font-medium text-white">
+                  Course Objectives
+                </p>
                 <Button
                   type="button"
                   variant="outline"
@@ -904,12 +1086,16 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Learning Outcomes</p>
+              <p className="text-sm font-medium text-white">
+                Learning Outcomes
+              </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => appendLearningOutcome({ cloCode: "", description: "" })}
+                onClick={() =>
+                  appendLearningOutcome({ cloCode: "", description: "" })
+                }
               >
                 <Plus className="mr-1 size-4" />
                 Add CLO
@@ -921,7 +1107,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </p>
             ) : null}
             {learningOutcomeFields.map((item, index) => (
-              <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
+              <div
+                key={item.id}
+                className="space-y-3 rounded-md border border-white/10 p-3"
+              >
                 <div className="grid grid-cols-[180px_1fr_auto] gap-2">
                   <FormField
                     control={form.control}
@@ -931,7 +1120,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                       <FormItem>
                         <FormLabel>CLO Code</FormLabel>
                         <FormControl>
-                          <Input {...field} className={inputClassName} disabled />
+                          <Input
+                            {...field}
+                            className={inputClassName}
+                            disabled
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -940,7 +1133,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   <FormField
                     control={form.control}
                     name={`learningOutcomes.${index}.description`}
-                    rules={{ required: "Learning outcome description is required" }}
+                    rules={{
+                      required: "Learning outcome description is required",
+                    }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>Description</FormLabel>
@@ -974,19 +1169,26 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-white">Program Learning Outcomes</p>
+              <p className="text-sm font-medium text-white">
+                Program Learning Outcomes
+              </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => appendProgramLearningOutcome({ ploCode: "", description: "" })}
+                onClick={() =>
+                  appendProgramLearningOutcome({ ploCode: "", description: "" })
+                }
               >
                 <Plus className="mr-1 size-4" />
                 Add PLO
               </Button>
             </div>
             {programLearningOutcomeFields.map((item, index) => (
-              <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
+              <div
+                key={item.id}
+                className="space-y-3 rounded-md border border-white/10 p-3"
+              >
                 <div className="grid grid-cols-[180px_1fr_auto] gap-2">
                   <FormField
                     control={form.control}
@@ -996,7 +1198,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                       <FormItem>
                         <FormLabel>PLO Code</FormLabel>
                         <FormControl>
-                          <Input {...field} className={inputClassName} disabled />
+                          <Input
+                            {...field}
+                            className={inputClassName}
+                            disabled
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1005,7 +1211,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   <FormField
                     control={form.control}
                     name={`programLearningOutcomes.${index}.description`}
-                    rules={{ required: "Program learning outcome description is required" }}
+                    rules={{
+                      required:
+                        "Program learning outcome description is required",
+                    }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>Description</FormLabel>
@@ -1059,7 +1268,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   onClick={() =>
                     appendWeeklyTopic({
                       weekNo: weeklyTopicFields.length + 1,
-                      weekDate: null,
                       subjectTitle: "",
                       detailsText: "",
                       tasksPrivateStudyText: "",
@@ -1072,12 +1280,41 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 </Button>
               </div>
             </div>
+            {unusedWeeklyPlanClos.length > 0 ? (
+              <div
+                role="status"
+                className="flex gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100"
+              >
+                <TriangleAlertIcon
+                  className="mt-0.5 size-4 shrink-0 text-amber-400"
+                  aria-hidden
+                />
+                <div>
+                  <p className="font-medium text-amber-50">
+                    Some CLOs are not used in the weekly plan
+                  </p>
+                  <p className="mt-1 text-amber-100/90">
+                    These learning outcomes are not linked to any week yet:{" "}
+                    <span className="font-mono">
+                      {unusedWeeklyPlanClos.join(", ")}
+                    </span>
+                    . Assign each CLO to at least one week in Related CLOs so
+                    coverage is clear.
+                  </p>
+                </div>
+              </div>
+            ) : null}
             {form.formState.errors.weeklyTopics?.message ? (
-              <p className="text-sm text-red-400">{String(form.formState.errors.weeklyTopics.message)}</p>
+              <p className="text-sm text-red-400">
+                {String(form.formState.errors.weeklyTopics.message)}
+              </p>
             ) : null}
             {weeklyTopicFields.map((item, index) => (
-              <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
-                <div className="grid grid-cols-[120px_200px_1fr_auto] gap-2">
+              <div
+                key={item.id}
+                className="space-y-3 rounded-md border border-white/10 p-3"
+              >
+                <div className="grid grid-cols-[120px_1fr_auto] gap-2">
                   <FormField
                     control={form.control}
                     name={`weeklyTopics.${index}.weekNo`}
@@ -1089,28 +1326,12 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                           <Input
                             type="number"
                             value={field.value}
-                            onChange={(event) => field.onChange(Number(event.target.value))}
+                            onChange={(event) =>
+                              field.onChange(Number(event.target.value))
+                            }
                             className={inputClassName}
                             min={1}
                             disabled
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`weeklyTopics.${index}.weekDate`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Week Date</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            value={field.value ?? ""}
-                            onChange={(event) => field.onChange(event.target.value || null)}
-                            className={inputClassName}
                           />
                         </FormControl>
                         <FormMessage />
@@ -1188,14 +1409,23 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   name={`weeklyTopics.${index}.clos`}
                   rules={{
                     validate: (value) =>
-                      value.length > 0 || "At least one related CLO is required",
+                      value.length > 0 ||
+                      "At least one related CLO is required",
                   }}
                   render={({ field }) => {
-                    const selectedCloCodes = field.value.map((closItem) => closItem.cloCode);
+                    const selectedCloCodes = field.value.map(
+                      (closItem) => closItem.cloCode,
+                    );
                     const selectedCloCodeSet = new Set(selectedCloCodes);
-                    const availableCloOptions = cloOptions.filter((cloCode) => !selectedCloCodeSet.has(cloCode));
+                    const availableCloOptions = cloOptions.filter(
+                      (cloCode) => !selectedCloCodeSet.has(cloCode),
+                    );
                     const selectedCloLabel =
-                      selectedCloCodes.length > 0 ? selectedCloCodes.join(", ") : "Select related CLOs";
+                      selectedCloCodes.length > 0
+                        ? selectedCloCodes
+                            .map((code) => formatCloComboboxLabel(code))
+                            .join(", ")
+                        : "Select related CLOs";
 
                     return (
                       <FormItem>
@@ -1206,7 +1436,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                             items={availableCloOptions}
                             value={selectedCloCodes}
                             onValueChange={(selectedCloCodes) =>
-                              field.onChange(selectedCloCodes.map((cloCode) => ({ cloCode })))
+                              field.onChange(
+                                selectedCloCodes.map((cloCode) => ({
+                                  cloCode,
+                                })),
+                              )
                             }
                             disabled={cloOptions.length === 0}
                           >
@@ -1217,7 +1451,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                                   variant="outline"
                                   className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
                                 >
-                                  <span className="truncate">{selectedCloLabel}</span>
+                                  <span className="truncate">
+                                    {selectedCloLabel}
+                                  </span>
                                 </Button>
                               }
                             />
@@ -1230,7 +1466,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                               <ComboboxList>
                                 {(item) => (
                                   <ComboboxItem key={item} value={item}>
-                                    {item}
+                                    {formatCloComboboxLabel(item)}
                                   </ComboboxItem>
                                 )}
                               </ComboboxList>
@@ -1244,12 +1480,16 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 />
               </div>
             ))}
-            <Dialog open={isWeeklyTopicsCsvDialogOpen} onOpenChange={setIsWeeklyTopicsCsvDialogOpen}>
+            <Dialog
+              open={isWeeklyTopicsCsvDialogOpen}
+              onOpenChange={setIsWeeklyTopicsCsvDialogOpen}
+            >
               <DialogContent className="max-w-3xl">
                 <DialogHeader>
                   <DialogTitle>Import Weekly Topics from CSV</DialogTitle>
                   <DialogDescription>
-                    Upload a CSV file matching the structure below, then click Submit Import.
+                    Upload a CSV file matching the structure below, then click
+                    Submit Import.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -1262,15 +1502,19 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     className="w-full rounded-md border border-white/10 bg-[#101010] px-3 py-2 text-sm text-white file:mr-3 file:rounded file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-black hover:file:bg-gray-200"
                   />
                   <div className="rounded-md border border-white/10 bg-[#101010] p-3">
-                    <p className="text-xs font-medium text-white">CSV Example Structure</p>
+                    <p className="text-xs font-medium text-white">
+                      CSV Example Structure
+                    </p>
                     <pre className="mt-2 overflow-x-auto rounded border border-white/10 bg-[#0a0a0a] p-2 text-xs text-gray-300">
-                      {`weekNo,weekDate,subjectTitle,detailsText,tasksPrivateStudyText,clos
-1,2026-10-05,Introduction to Systems,"Overview of systems and scope","Read chapter 1",CLO-1|CLO-2
-2,2026-10-12,Architecture Fundamentals,"Core architecture concepts","Prepare summary notes",CLO-2|CLO-3`}
+                      {`weekNo,subjectTitle,detailsText,tasksPrivateStudyText,clos
+1,Introduction to Systems,"Overview of systems and scope","Read chapter 1",CLO-1|CLO-2
+2,Architecture Fundamentals,"Core architecture concepts","Prepare summary notes",CLO-2|CLO-3`}
                     </pre>
                   </div>
                   {weeklyTopicsCsvDialogError ? (
-                    <p className="text-sm text-red-400">{weeklyTopicsCsvDialogError}</p>
+                    <p className="text-sm text-red-400">
+                      {weeklyTopicsCsvDialogError}
+                    </p>
                   ) : null}
                 </div>
 
@@ -1285,7 +1529,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                   >
                     Cancel
                   </Button>
-                  <Button type="button" onClick={handleWeeklyTopicsCsvImportSubmit}>
+                  <Button
+                    type="button"
+                    onClick={handleWeeklyTopicsCsvImportSubmit}
+                  >
                     Submit Import
                   </Button>
                 </DialogFooter>
@@ -1302,7 +1549,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => appendEvaluationItem({ title: "", count: 1, weight: 0, clos: [] })}
+                onClick={() =>
+                  appendEvaluationItem({ title: "", count: 1, weight: 0 })
+                }
               >
                 <Plus className="mr-1 size-4" />
                 Add Evaluation
@@ -1314,7 +1563,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </p>
             ) : null}
             {evaluationItemFields.map((item, index) => (
-              <div key={item.id} className="space-y-3 rounded-md border border-white/10 p-3">
+              <div
+                key={item.id}
+                className="space-y-3 rounded-md border border-white/10 p-3"
+              >
                 <div className="grid grid-cols-[1fr_140px_140px_auto] gap-2">
                   <FormField
                     control={form.control}
@@ -1324,7 +1576,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                       <FormItem>
                         <FormLabel required>Title</FormLabel>
                         <FormControl>
-                          <Input {...field} className={inputClassName} placeholder="Midterm Exam" />
+                          <Input
+                            {...field}
+                            className={inputClassName}
+                            placeholder="Midterm Exam"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1341,7 +1597,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                           <Input
                             type="number"
                             value={field.value}
-                            onChange={(event) => field.onChange(Number(event.target.value))}
+                            onChange={(event) =>
+                              field.onChange(Number(event.target.value))
+                            }
                             className={inputClassName}
                             min={1}
                           />
@@ -1361,7 +1619,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                           <Input
                             type="number"
                             value={field.value}
-                            onChange={(event) => field.onChange(Number(event.target.value))}
+                            onChange={(event) =>
+                              field.onChange(Number(event.target.value))
+                            }
                             className={inputClassName}
                             min={0}
                           />
@@ -1381,61 +1641,6 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     <Trash2 className="size-4" />
                   </Button>
                 </div>
-                <FormField
-                  control={form.control}
-                  name={`evaluationItems.${index}.clos`}
-                  render={({ field }) => {
-                    const selectedCloCodes = field.value.map((closItem) => closItem.cloCode);
-                    const selectedCloCodeSet = new Set(selectedCloCodes);
-                    const availableCloOptions = cloOptions.filter((cloCode) => !selectedCloCodeSet.has(cloCode));
-                    const selectedCloLabel =
-                      selectedCloCodes.length > 0 ? selectedCloCodes.join(", ") : "Select related CLOs";
-
-                    return (
-                      <FormItem>
-                        <FormLabel required>Related CLOs</FormLabel>
-                        <FormControl>
-                          <Combobox
-                            multiple
-                            items={availableCloOptions}
-                            value={selectedCloCodes}
-                            onValueChange={(selectedCloCodes) =>
-                              field.onChange(selectedCloCodes.map((cloCode) => ({ cloCode })))
-                            }
-                            disabled={cloOptions.length === 0}
-                          >
-                            <ComboboxTrigger
-                              render={
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="w-full justify-between border-white/10 bg-[#101010] font-normal text-white hover:bg-[#101010] hover:text-white"
-                                >
-                                  <span className="truncate">{selectedCloLabel}</span>
-                                </Button>
-                              }
-                            />
-                            <ComboboxContent>
-                              <ComboboxInput
-                                showTrigger={false}
-                                placeholder="Search CLO..."
-                              />
-                              <ComboboxEmpty>No CLO found.</ComboboxEmpty>
-                              <ComboboxList>
-                                {(item) => (
-                                  <ComboboxItem key={item} value={item}>
-                                    {item}
-                                  </ComboboxItem>
-                                )}
-                              </ComboboxList>
-                            </ComboboxContent>
-                          </Combobox>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
               </div>
             ))}
           </div>
@@ -1456,7 +1661,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </Button>
             </div>
             {coursesError ? (
-              <p className="text-sm text-red-400">Failed to load course credits for workload validation.</p>
+              <p className="text-sm text-red-400">
+                Failed to load course credits for workload validation.
+              </p>
             ) : null}
             {loadingCourses ? (
               <p className="text-sm text-gray-400">Loading course credits...</p>
@@ -1467,7 +1674,10 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </p>
             ) : null}
             {workloadItemFields.map((item, index) => (
-              <div key={item.id} className="grid grid-cols-[1fr_160px_auto] gap-2 rounded-md border border-white/10 p-3">
+              <div
+                key={item.id}
+                className="grid grid-cols-[1fr_160px_auto] gap-2 rounded-md border border-white/10 p-3"
+              >
                 <FormField
                   control={form.control}
                   name={`workloadItems.${index}.activity`}
@@ -1476,7 +1686,11 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     <FormItem>
                       <FormLabel required>Activity</FormLabel>
                       <FormControl>
-                        <Input {...field} className={inputClassName} placeholder="Lecture" />
+                        <Input
+                          {...field}
+                          className={inputClassName}
+                          placeholder="Lecture"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1493,7 +1707,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                         <Input
                           type="number"
                           value={field.value}
-                          onChange={(event) => field.onChange(Number(event.target.value))}
+                          onChange={(event) =>
+                            field.onChange(Number(event.target.value))
+                          }
                           className={inputClassName}
                           min={0}
                         />
@@ -1592,47 +1808,68 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
             />
           </div>
         );
-      case "Review & Publish":
-        {
-          const values = form.getValues();
-          const selectedTermLabel =
-            termOptions.find((option) => option.value === String(values.termId))?.label ?? `Term #${values.termId}`;
-          const selectedLecturerLabel =
-            approvedUserOptions.find((option) => option.value === String(values.lecturerUserId))?.label ??
-            `User #${values.lecturerUserId}`;
-          const selectedAssistantLabels =
-            values.assistantUserIds.length === 0
-              ? "None"
-              : values.assistantUserIds
-                  .map(
-                    (assistantUserId) =>
-                      approvedUserOptions.find((option) => option.value === String(assistantUserId))?.label ??
-                      `User #${assistantUserId}`
-                  )
-                  .join(", ");
+      case "Review & Publish": {
+        const values = form.getValues();
+        const selectedTermLabel =
+          termOptions.find((option) => option.value === String(values.termId))
+            ?.label ?? `Term #${values.termId}`;
+        const selectedLecturerLabel =
+          approvedUserOptions.find(
+            (option) => option.value === String(values.lecturerUserId),
+          )?.label ?? `User #${values.lecturerUserId}`;
+        const selectedAssistantLabels =
+          values.assistantUserIds.length === 0
+            ? "None"
+            : values.assistantUserIds
+                .map(
+                  (assistantUserId) =>
+                    approvedUserOptions.find(
+                      (option) => option.value === String(assistantUserId),
+                    )?.label ?? `User #${assistantUserId}`,
+                )
+                .join(", ");
 
         return (
           <div className="space-y-4 text-sm text-gray-300">
             <div>
-              <p className="text-base font-semibold text-white">Review your outline details</p>
+              <p className="text-base font-semibold text-white">
+                Review your outline details
+              </p>
               <p className="mt-1 text-gray-400">
-                Check each section before publishing. Use Previous if you want to edit anything.
+                Check each section before publishing. Use Previous if you want
+                to edit anything.
               </p>
             </div>
 
             <div className="grid gap-4 grid-cols-1">
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Basic Info</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Basic Info
+                </p>
                 <div className="space-y-2">
-                  <p><span className="text-gray-400">Course ID:</span> {values.courseId}</p>
-                  <p><span className="text-gray-400">Term:</span> {selectedTermLabel}</p>
-                  <p><span className="text-gray-400">Lecturer:</span> {selectedLecturerLabel}</p>
-                  <p><span className="text-gray-400">Assistants:</span> {selectedAssistantLabels}</p>
+                  <p>
+                    <span className="text-gray-400">Course ID:</span>{" "}
+                    {values.courseId}
+                  </p>
+                  <p>
+                    <span className="text-gray-400">Term:</span>{" "}
+                    {selectedTermLabel}
+                  </p>
+                  <p>
+                    <span className="text-gray-400">Lecturer:</span>{" "}
+                    {selectedLecturerLabel}
+                  </p>
+                  <p>
+                    <span className="text-gray-400">Assistants:</span>{" "}
+                    {selectedAssistantLabels}
+                  </p>
                 </div>
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Learning Outcomes (CLOs)</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Learning Outcomes (CLOs)
+                </p>
                 <div className="space-y-2">
                   {values.learningOutcomes.map((outcome) => (
                     <div key={outcome.cloCode}>
@@ -1644,7 +1881,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Program Learning Outcomes (PLOs)</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Program Learning Outcomes (PLOs)
+                </p>
                 <div className="space-y-2">
                   {values.programLearningOutcomes.map((outcome) => (
                     <div key={outcome.ploCode}>
@@ -1656,42 +1895,62 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Objectives</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Objectives
+                </p>
                 <ul className="list-disc space-y-1 pl-4">
                   {values.objectives.map((objective, index) => (
-                    <li key={`objective-${index}`}>{renderRichText(objective.description)}</li>
+                    <li key={`objective-${index}`}>
+                      {renderRichText(objective.description)}
+                    </li>
                   ))}
                 </ul>
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Content Items</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Content Items
+                </p>
                 <ul className="list-disc space-y-1 pl-4">
                   {values.contentItems.map((item, index) => (
-                    <li key={`content-${index}`}>{renderRichText(item.description)}</li>
+                    <li key={`content-${index}`}>
+                      {renderRichText(item.description)}
+                    </li>
                   ))}
                 </ul>
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Weekly Plan</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Weekly Plan
+                </p>
                 <div className="space-y-3">
                   {values.weeklyTopics.map((topic) => (
-                    <div key={`week-${topic.weekNo}`} className="rounded border border-white/10 p-3">
-                      <p><span className="text-gray-400">Week {topic.weekNo}:</span> {topic.subjectTitle || "-"}</p>
-                      <p className="mt-1">
-                        <span className="text-gray-400">Date:</span> {topic.weekDate || "-"}
+                    <div
+                      key={`week-${topic.weekNo}`}
+                      className="rounded border border-white/10 p-3"
+                    >
+                      <p>
+                        <span className="text-gray-400">
+                          Week {topic.weekNo}:
+                        </span>{" "}
+                        {topic.subjectTitle || "-"}
                       </p>
                       <div className="mt-1">
-                        <span className="text-gray-400">Details:</span> {renderRichText(topic.detailsText)}
+                        <span className="text-gray-400">Details:</span>{" "}
+                        {renderRichText(topic.detailsText)}
                       </div>
                       <div className="mt-1">
-                        <span className="text-gray-400">Tasks / Private Study:</span>{" "}
+                        <span className="text-gray-400">
+                          Tasks / Private Study:
+                        </span>{" "}
                         {renderRichText(topic.tasksPrivateStudyText)}
                       </div>
                       <p className="mt-1">
                         <span className="text-gray-400">Related CLOs:</span>{" "}
-                        {topic.clos.length > 0 ? topic.clos.map((clo) => clo.cloCode).join(", ") : "-"}
+                        {topic.clos.length > 0
+                          ? topic.clos.map((clo) => clo.cloCode).join(", ")
+                          : "-"}
                       </p>
                     </div>
                   ))}
@@ -1699,19 +1958,24 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Evaluation</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Evaluation
+                </p>
                 <div className="space-y-3">
                   {values.evaluationItems.map((item, index) => (
-                    <div key={`assessment-${index}`} className="rounded border border-white/10 p-3">
+                    <div
+                      key={`assessment-${index}`}
+                      className="rounded border border-white/10 p-3"
+                    >
                       <p>
-                        <span className="text-gray-400">{item.title || "Untitled"}:</span> {item.weight}%
+                        <span className="text-gray-400">
+                          {item.title || "Untitled"}:
+                        </span>{" "}
+                        {item.weight}%
                       </p>
                       <p className="mt-1">
-                        <span className="text-gray-400">Count:</span> {item.count || 0}
-                      </p>
-                      <p className="mt-1">
-                        <span className="text-gray-400">Related CLOs:</span>{" "}
-                        {item.clos.length > 0 ? item.clos.map((clo) => clo.cloCode).join(", ") : "-"}
+                        <span className="text-gray-400">Count:</span>{" "}
+                        {item.count || 0}
                       </p>
                     </div>
                   ))}
@@ -1719,7 +1983,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Workload</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Workload
+                </p>
                 <ul className="list-disc space-y-1 pl-4">
                   {values.workloadItems.map((workload, index) => (
                     <li key={`workload-${index}`}>
@@ -1730,23 +1996,32 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
               </div>
 
               <div className="rounded-md border border-white/10 bg-[#101010] p-4">
-                <p className="mb-3 text-sm font-semibold text-white">Resources</p>
+                <p className="mb-3 text-sm font-semibold text-white">
+                  Resources
+                </p>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-gray-400">Textbooks:</span> {renderRichText(values.textbooksText)}
+                    <span className="text-gray-400">Textbooks:</span>{" "}
+                    {renderRichText(values.textbooksText)}
                   </div>
                   <div>
                     <span className="text-gray-400">Additional Reading:</span>{" "}
                     {renderRichText(values.additionalReadingText)}
                   </div>
-                  <p><span className="text-gray-400">Office Hours:</span> {values.officeHours || "-"}</p>
-                  <p><span className="text-gray-400">Office Code:</span> {values.officeCode || "-"}</p>
+                  <p>
+                    <span className="text-gray-400">Office Hours:</span>{" "}
+                    {values.officeHours || "-"}
+                  </p>
+                  <p>
+                    <span className="text-gray-400">Office Code:</span>{" "}
+                    {values.officeCode || "-"}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         );
-        }
+      }
       default:
         return null;
     }
@@ -1782,7 +2057,9 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                 type="button"
                 variant="outline"
                 disabled={activeTabIndex === 0}
-                onClick={() => setActiveTabIndex((current) => Math.max(current - 1, 0))}
+                onClick={() =>
+                  setActiveTabIndex((current) => Math.max(current - 1, 0))
+                }
               >
                 Previous
               </Button>
