@@ -6,4 +6,6 @@ export type UserWithRole = {
   email: string
   createdAt: string
   userRole: string | null
+  userTypeId?: number | null
+  typeName?: string | null
 }

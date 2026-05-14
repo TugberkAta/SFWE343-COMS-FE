@@ -12,6 +12,14 @@ const users = {
   userRoles: () => `/user-roles`,
 };
 
+const userTypes = {
+  getAll: () => `/user-types`,
+  getById: (userTypeId: number) => `/user-types/${userTypeId}`,
+  create: () => `/user-types`,
+  putById: (userTypeId: number) => `/user-types/${userTypeId}`,
+  deleteById: (userTypeId: number) => `/user-types/${userTypeId}`,
+};
+
 const departments = {
   getAll: () => `/departments`,
 };
@@ -37,4 +45,4 @@ const outlines = {
   deleteById: (outlineId: number) => `/outlines/${outlineId}`,
 };
 
-export { user, users, departments, programs, courses, terms, outlines };
+export { user, users, userTypes, departments, programs, courses, terms, outlines };

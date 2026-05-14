@@ -1,6 +1,6 @@
 export type PostApproveUserBody = {
   userId: number
-  userRoleId?: number
+  userTypeId: number
   approvedStatus: boolean
 }
 

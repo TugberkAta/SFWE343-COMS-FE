@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import postRejectUser from "@/services/users/post-reject-user"
 import type { UserWithNoRole } from "@/types/user-with-no-role"
+import { PermissionGate } from "@/components/PermissionGate"
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
 
 const rejectFormSchema = z.object({})
 
@@ -56,10 +58,12 @@ export function RejectUserDialog({
 
   const onSubmit = form.handleSubmit(async () => {
     if (!user) return
+
     try {
       await postRejectUser({
         userId: user.userId,
       })
+
       await onRejected()
     } catch (error) {
       console.error("Reject error:", error)
@@ -107,13 +111,18 @@ export function RejectUserDialog({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="destructive"
-                disabled={form.formState.isSubmitting || !user}
-              >
-                {form.formState.isSubmitting ? "Rejecting…" : "Reject request"}
-              </Button>
+
+              {/* 🔥 RBAC */}
+              <PermissionGate permission={ENDPOINT_PERMISSIONS.users.APPROVE}>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={form.formState.isSubmitting || !user}
+                >
+                  {form.formState.isSubmitting ? "Rejecting…" : "Reject request"}
+                </Button>
+              </PermissionGate>
+
             </DialogFooter>
           </form>
         </Form>

@@ -17,15 +17,25 @@ import { SettingsIcon } from "lucide-react";
 import { NavSecondary } from "./nav-secondary";
 import { secondaryNavigation } from "@/config/navigation";
 import { settingsSecondaryNavigation } from "@/config/navigation";
+import { usePermission } from "@/hooks/use-permission";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const pathname = location.pathname;
 
+  const { hasPermission } = usePermission();
+
   const isSettingsSection = pathname.includes("/settings");
 
   const mainTabs = getMainNavigation();
   const settingsTabs = getSettingsNavigation();
+
+  const filteredMainTabs = mainTabs.filter((item) => {
+    if (item.permission) {
+      return hasPermission(item.permission);
+    }
+    return true;
+  });
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -49,12 +59,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         <div className="border-b border-sidebar-border mx-2 mt-2" />
       </SidebarHeader>
+
       <SidebarContent>
         {isSettingsSection ? (
           <NavMain items={settingsTabs} />
         ) : (
-          <NavMain items={mainTabs} />
+          <NavMain items={filteredMainTabs} />
         )}
+
         {isSettingsSection ? (
           <NavSecondary
             items={settingsSecondaryNavigation}
@@ -64,7 +76,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavSecondary items={secondaryNavigation} className="mt-auto" />
         )}
       </SidebarContent>
+
       <div className="border-b border-sidebar-border mx-2 mt-2" />
+
       <SidebarFooter>
         <NavUser
           user={{

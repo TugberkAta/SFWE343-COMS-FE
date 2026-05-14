@@ -6,11 +6,15 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useFetchData from "@/hooks/use-fetch-data"
 import getUsersWithNoRole from "@/services/users/users-with-no-role"
-import getUserRoles from "@/services/users/get-user-roles"
+import { getUserTypes } from "@/services/user-types"
 import type { UserWithNoRole } from "@/types/user-with-no-role"
 import { Loader2Icon, TriangleAlertIcon } from "lucide-react"
 import { ApproveUserDialog } from "./approve-user-dialog"
 import { RejectUserDialog } from "./reject-user-dialog"
+import { usePermission } from "@/hooks/use-permission"
+import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
+import { PermissionGate } from "@/components/PermissionGate"
+import { PermissionProtectedPage } from "@/components/PermissionProtectedPage"
 
 function fullName(user: UserWithNoRole) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "—"
@@ -25,26 +29,33 @@ export default function PendingUsersPage() {
   const [search, setSearch] = React.useState("")
   const [dialog, setDialog] = React.useState<PendingDialog>({ type: "closed" })
 
+  const { hasPermission } = usePermission()
+
   const [loading, errored, usersData, refetch] = useFetchData(
     () => getUsersWithNoRole(),
     []
   )
 
-  const [rolesLoading, rolesErrored, rolesData] = useFetchData(
-    () => getUserRoles(),
+  const [typesLoading, typesErrored, typesData] = useFetchData(
+    () => getUserTypes(),
     []
   )
 
-  if (loading || rolesLoading) {
+  // 🔥 PAGE PROTECTION
+  if (!hasPermission(ENDPOINT_PERMISSIONS.users.APPROVE)) {
+    return <PermissionProtectedPage />
+  }
+
+  if (loading || typesLoading) {
     return <Loader2Icon className="size-4 animate-spin" />
   }
 
-  if (errored || rolesErrored) {
+  if (errored || typesErrored) {
     return <TriangleAlertIcon className="size-4 text-destructive" />
   }
 
-  const users = usersData.users ?? []
-  const roles = rolesData.userRoles ?? []
+  const users = usersData?.users ?? []
+  const userTypes = typesData?.userTypes ?? []
 
   const filteredData = users.filter(
     (item: UserWithNoRole) =>
@@ -64,8 +75,7 @@ export default function PendingUsersPage() {
     setDialog({ type: "reject", user })
   }
 
-  const approveUser =
-    dialog.type === "approve" ? dialog.user : null
+  const approveUser = dialog.type === "approve" ? dialog.user : null
   const rejectUser = dialog.type === "reject" ? dialog.user : null
 
   const handleAfterApprove = async () => {
@@ -106,15 +116,6 @@ export default function PendingUsersPage() {
             />
           </div>
 
-          {loading ? (
-            <p className="text-sm text-muted-foreground">Loading users…</p>
-          ) : errored ? (
-            <p className="text-sm text-destructive">
-              Could not load users. Check that you are signed in as an admin and
-              try again.
-            </p>
-          ) : null}
-
           <div className="border rounded-md overflow-hidden">
             <table className="w-full caption-bottom text-sm rounded-md">
               <thead className="[&_tr]:border-b bg-background/30">
@@ -127,11 +128,16 @@ export default function PendingUsersPage() {
               </thead>
 
               <tbody>
-                {!loading && !errored && filteredData.length ? (
+                {filteredData.length ? (
                   filteredData.map((user: UserWithNoRole) => (
-                    <tr key={user.userId} className="border-b hover:bg-muted/50 bg-background/30">
+                    <tr
+                      key={user.userId}
+                      className="border-b hover:bg-muted/50 bg-background/30"
+                    >
                       <td className="p-4 font-medium">{fullName(user)}</td>
-                      <td className="p-4 text-muted-foreground">{user.email}</td>
+                      <td className="p-4 text-muted-foreground">
+                        {user.email}
+                      </td>
                       <td className="p-4 text-muted-foreground">
                         {user.createdAt
                           ? new Date(user.createdAt).toLocaleString()
@@ -139,20 +145,28 @@ export default function PendingUsersPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => openApprove(user)}
-                          >
-                            Approve
-                          </Button>
+                          
+                          {/*  APPROVE BUTTON */}
+                          <PermissionGate permission={ENDPOINT_PERMISSIONS.users.APPROVE}>
+                            <Button
+                              size="sm"
+                              onClick={() => openApprove(user)}
+                            >
+                              Approve
+                            </Button>
+                          </PermissionGate>
 
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => openReject(user)}
-                          >
-                            Reject
-                          </Button>
+                          {/*  REJECT BUTTON */}
+                          <PermissionGate permission={ENDPOINT_PERMISSIONS.users.APPROVE}>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => openReject(user)}
+                            >
+                              Reject
+                            </Button>
+                          </PermissionGate>
+
                         </div>
                       </td>
                     </tr>
@@ -163,11 +177,7 @@ export default function PendingUsersPage() {
                       colSpan={4}
                       className="p-6 text-center text-muted-foreground"
                     >
-                      {loading
-                        ? "Loading…"
-                        : errored
-                          ? "Failed to load data."
-                          : "No results."}
+                      No results.
                     </td>
                   </tr>
                 )}
@@ -194,9 +204,9 @@ export default function PendingUsersPage() {
           if (!open) dismissDialog()
         }}
         user={approveUser}
-        roles={roles}
-        rolesLoading={rolesLoading}
-        rolesErrored={rolesErrored}
+        userTypes={userTypes}
+        userTypesLoading={typesLoading}
+        userTypesErrored={typesErrored}
         onApproved={handleAfterApprove}
       />
 

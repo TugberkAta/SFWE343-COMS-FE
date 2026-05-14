@@ -28,76 +28,80 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import postApproveUser from "@/services/users/post-approve-user"
-import type { UserWithNoRole } from "@/types/user-with-no-role"
+import patchUserRole from "@/services/users/patch-user-role"
+import type { UserWithRole } from "@/types/user-with-role"
 import type { UserType } from "@/types/user-type"
 import { PermissionGate } from "@/components/PermissionGate"
 import { ENDPOINT_PERMISSIONS } from "@/constants/permissions"
 
-const approveFormSchema = z.object({
+const assignUserTypeFormSchema = z.object({
   userTypeId: z.number().int().positive(),
 })
 
-type ApproveFormValues = z.infer<typeof approveFormSchema>
+type AssignUserTypeFormValues = z.infer<typeof assignUserTypeFormSchema>
 
-function displayName(user: UserWithNoRole) {
+function displayName(user: UserWithRole) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "—"
 }
 
-type ApproveUserDialogProps = {
+type AssignUserTypeDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  user: UserWithNoRole | null
+  user: UserWithRole | null
   userTypes: UserType[]
   userTypesLoading: boolean
   userTypesErrored: boolean
-  onApproved: () => Promise<void>
+  onAssigned: () => Promise<void>
 }
 
-export function ApproveUserDialog({
+export function AssignUserTypeDialog({
   open,
   onOpenChange,
   user,
   userTypes,
   userTypesLoading,
   userTypesErrored,
-  onApproved,
-}: ApproveUserDialogProps) {
-  const firstTypeId = userTypes[0]?.userTypeId
-
-  const form = useForm<ApproveFormValues>({
-    resolver: zodResolver(approveFormSchema),
+  onAssigned,
+}: AssignUserTypeDialogProps) {
+  const form = useForm<AssignUserTypeFormValues>({
+    resolver: zodResolver(assignUserTypeFormSchema),
     defaultValues: {
-      userTypeId: firstTypeId ?? 0,
+      userTypeId: undefined,
     },
   })
 
   React.useEffect(() => {
-    if (open && firstTypeId !== undefined) {
-      form.reset({ userTypeId: firstTypeId })
+    if (open && user) {
+      const currentTypeId =
+        user.userTypeId != null
+          ? userTypes.find((t) => t.userTypeId === user.userTypeId)?.userTypeId
+          : undefined
+      const fallbackTypeId = userTypes[0]?.userTypeId
+      form.reset({
+        userTypeId: currentTypeId ?? fallbackTypeId,
+      })
+    } else {
+      form.reset()
     }
-  }, [open, user?.userId, firstTypeId, form])
+  }, [open, user, userTypes, form])
 
-  const handleDismiss = () => {
-    if (form.formState.isSubmitting) return
-    onOpenChange(false)
+  const onSubmit = async (data: AssignUserTypeFormValues) => {
+    if (!user) return
+    try {
+      await patchUserRole(user.userId, {
+        userTypeId: data.userTypeId,
+      })
+      await onAssigned()
+      onOpenChange(false)
+    } catch (error) {
+      console.error("Assign user type error:", error)
+    }
   }
 
-  const onSubmit = form.handleSubmit(async (values) => {
-    if (!user) return
-
-    try {
-      await postApproveUser({
-        userId: user.userId,
-        userTypeId: values.userTypeId,
-        approvedStatus: true,
-      })
-
-      await onApproved()
-    } catch (error) {
-      console.error("Approve error:", error)
-    }
-  })
+  const handleDismiss = () => {
+    form.reset()
+    onOpenChange(false)
+  }
 
   const canSubmit =
     !userTypesLoading && !userTypesErrored && userTypes.length > 0 && user !== null
@@ -106,16 +110,16 @@ export function ApproveUserDialog({
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Approve user</DialogTitle>
+          <DialogTitle>Assign user type</DialogTitle>
           <DialogDescription>
             {user
-              ? `Choose a user type for ${displayName(user)} (${user.email}) before approving.`
-              : "Choose a user type before approving this user."}
+              ? `Update user type for ${displayName(user)} (${user.email}).`
+              : "Select a user type for this user."}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form} key={user?.userId ?? "closed"}>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="userTypeId"
@@ -133,7 +137,7 @@ export function ApproveUserDialog({
                     <p className="text-sm text-muted-foreground">No user types available.</p>
                   ) : (
                     <Select
-                      value={String(field.value)}
+                      value={String(field.value ?? "")}
                       onValueChange={(v) => field.onChange(Number(v))}
                       disabled={form.formState.isSubmitting}
                     >
@@ -168,12 +172,12 @@ export function ApproveUserDialog({
                 Cancel
               </Button>
 
-              <PermissionGate permission={ENDPOINT_PERMISSIONS.users.APPROVE}>
+              <PermissionGate permission={ENDPOINT_PERMISSIONS.users.EDIT}>
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting || !canSubmit}
                 >
-                  {form.formState.isSubmitting ? "Submitting..." : "Confirm"}
+                  {form.formState.isSubmitting ? "Saving..." : "Save"}
                 </Button>
               </PermissionGate>
             </DialogFooter>

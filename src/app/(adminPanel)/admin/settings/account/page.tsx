@@ -16,6 +16,8 @@ function initials(first: string, last: string) {
 export default function AccountPage() {
   const currentUser = useMemo(() => auth.getCurrentUser(), []);
 
+  console.log(currentUser);
+
   return (
     <div className="flex flex-1 flex-col gap-6 px-4 pb-10 pt-2 md:px-8">
       <h1 className="text-3xl font-semibold tracking-tight text-foreground">

@@ -1,6 +1,24 @@
 import axios from "axios";
 import { user } from "@/constants/endpoints";
-import parseJWTPayload from "@/utils/parse-jwt-payload";
+import parseJWTPayload, { type JwtPayload } from "@/utils/parse-jwt-payload";
+
+function normalizePermissionsFromPayload(payload: JwtPayload): string[] {
+  const raw = payload.permissions ?? payload.permissionsJson;
+  if (Array.isArray(raw)) {
+    return raw.filter((p): p is string => typeof p === "string");
+  }
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        return parsed.filter((p): p is string => typeof p === "string");
+      }
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
 
 type RegisterPayload = {
   firstName: string;
@@ -20,6 +38,8 @@ type UserToken = {
   firstName: string;
   lastName: string;
   email: string;
+  typeName: string;
+  permissions: string[];
 };
 
 class Authentication {
@@ -97,6 +117,8 @@ class Authentication {
       firstName: payload.firstName as string,
       lastName: payload.lastName as string,
       email: payload.email as string,
+      typeName: payload.typeName as string,
+      permissions: normalizePermissionsFromPayload(payload),
     };
   }
 }
