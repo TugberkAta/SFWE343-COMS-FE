@@ -55,12 +55,29 @@ const FacultiesPage = () => {
   if (error) return <div className="p-6 text-red-600">Error loading faculties.</div>;
 
   return (
-    <div className="space-y-8 p-6 bg-[#f8f8f8] min-h-screen">
+    <div className="space-y-6 p-6 bg-white dark:bg-black min-h-screen">
+      {/* Branding Header */}
+      <div className="flex items-center gap-4 pb-6 border-b border-[#e5e7eb] dark:border-[#333]">
+        <img 
+          src="https://study-more.com/wp-content/uploads/2024/04/fiu-unv-logo.png" 
+          alt="FIU Logo"
+          className="h-14 w-auto"
+        />
+        <div>
+          <h2 className="text-2xl font-bold text-[#111827] dark:text-white">
+            Final International University
+          </h2>
+          <p className="text-sm text-[#6b7280] dark:text-[#888]">
+            Course Outline Management System
+          </p>
+        </div>
+      </div>
+
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-[#111827]">
+        <h1 className="text-3xl font-bold tracking-tight text-[#111827] dark:text-white">
           Faculties
         </h1>
-        <p className="mt-2 text-lg text-[#6b7280]">
+        <p className="mt-2 text-sm text-[#6b7280] dark:text-[#888]">
           Select a faculty to view programs.
         </p>
       </div>
@@ -69,10 +86,10 @@ const FacultiesPage = () => {
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="Search faculties..."
-        className="max-w-md bg-white border border-[#e5e7eb] text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2] rounded-lg"
+        className="max-w-md"
       />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredDepartments.map((department, index) => (
           <FacultyProgramCard
             key={department.departmentId}
@@ -90,7 +107,7 @@ const FacultiesPage = () => {
       </div>
 
       {!filteredDepartments.length ? (
-        <p className="text-sm text-[#6b7280]">No faculties match your search.</p>
+        <p className="text-sm text-[#6b7280] dark:text-[#888]">No faculties match your search.</p>
       ) : null}
     </div>
   );

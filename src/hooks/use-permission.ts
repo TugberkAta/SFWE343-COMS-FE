@@ -1,6 +1,4 @@
 export const usePermission = () => {
-
-  
   const user = {
     permissions: [
       "users.read",
@@ -16,10 +14,11 @@ export const usePermission = () => {
     ],
   };
 
-  const hasPermission = (permission: string) => {
-    return user.permissions.includes(permission);
+  const hasPermission = (permission?: string) => {
+    if (!permission) return true;
+
+    return user.permissions?.includes(permission) ?? false;
   };
 
   return { hasPermission };
 };
-

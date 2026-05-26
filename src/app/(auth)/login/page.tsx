@@ -47,13 +47,27 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 bg-white dark:bg-black">
       <div className="flex w-full max-w-md flex-col gap-6">
         <div className={cn("flex flex-col gap-6")}>
-          <Card>
-            <CardHeader className="text-center p-8">
-              <img src="https://study-more.com/wp-content/uploads/2024/04/fiu-unv-logo.png" alt="" />
-              <CardTitle className="text-xl">Login</CardTitle>
+          <Card className="dark:bg-[#1a1a1a] dark:border-[#333]">
+            <CardHeader className="text-center p-6">
+              <div className="flex flex-col items-center gap-3 mb-2">
+                <img 
+                  src="https://study-more.com/wp-content/uploads/2024/04/fiu-unv-logo.png" 
+                  alt="FIU Logo"
+                  className="h-24 w-auto"
+                />
+                <div>
+                  <h2 className="text-lg font-bold text-[#111827] dark:text-white">
+                    Final International University
+                  </h2>
+                  <p className="text-sm text-[#6b7280] dark:text-[#888]">
+                    Course Outline Management System
+                  </p>
+                </div>
+              </div>
+              <CardTitle className="text-xl text-[#111827] dark:text-white mt-4">Login</CardTitle>
             </CardHeader>
             <CardContent className="px-8">
               <Form {...form}>
@@ -64,7 +78,7 @@ export default function LoginPage() {
                       name="email"
                       render={({ field }) => (
                         <div className="grid gap-2">
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email" className="text-[#111827] dark:text-white">Email</Label>
                           <FormControl>
                             <Input
                               {...field}
@@ -81,7 +95,7 @@ export default function LoginPage() {
                       name="password"
                       render={({ field }) => (
                         <div className="grid gap-2">
-                          <Label htmlFor="password">Password</Label>
+                          <Label htmlFor="password" className="text-[#111827] dark:text-white">Password</Label>
                           <FormControl>
                             <Input
                               {...field}
@@ -104,7 +118,7 @@ export default function LoginPage() {
                   </div>
 
                   <div className="text-center mt-4">
-                    <p>Don't have an account? <Link to="/email-auth" className="text-primary hover:underline">Create an account</Link></p>
+                    <p className="text-[#111827] dark:text-[#888]">Don't have an account? <Link to="/email-auth" className="text-[#ef233c] hover:text-[#e60012] font-medium">Create an account</Link></p>
                   </div>
                 </form>
               </Form>

@@ -13,10 +13,14 @@ import { useLocation, Link } from "react-router-dom";
 import { capitalize } from "@/utils/capitalize";
 import { useBreadcrumb } from "@/contexts/breadcrumb-context";
 import { isValidRoute } from "@/constants/routes";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function PageHeader() {
   const location = useLocation();
   const { breadcrumbData } = useBreadcrumb();
+  const { theme, setTheme } = useTheme();
   const pathname = location.pathname;
 
   const pathSegments = pathname.split("/").filter(Boolean);
@@ -61,12 +65,12 @@ export function PageHeader() {
   }, [pathSegments, breadcrumbData.rules, breadcrumbData.labels]);
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 bg-white border-b border-[#e5e7eb]">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-2 bg-white dark:bg-[#1a1a1a] border-b border-[#e5e7eb] dark:border-[#333]">
       <div className="flex items-center gap-2 px-4">
-        <SidebarTrigger className="-ml-1 text-[#111827]" />
+        <SidebarTrigger className="-ml-1 text-[#111827] dark:text-white" />
         <Separator
           orientation="vertical"
-          className="mr-2 data-[orientation=vertical]:h-4 bg-[#e5e7eb]"
+          className="mr-2 data-[orientation=vertical]:h-4 bg-[#e5e7eb] dark:bg-[#333]"
         />
         <Breadcrumb>
           <BreadcrumbList>
@@ -74,10 +78,10 @@ export function PageHeader() {
               <Fragment key={item.url}>
                 <BreadcrumbItem>
                   {index === breadcrumbItems.length - 1 ? (
-                    <BreadcrumbPage className="text-[#111827]">{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage className="text-[#111827] dark:text-white">{item.label}</BreadcrumbPage>
                   ) : item.isValid ? (
                     <BreadcrumbLink asChild>
-                      <Link to={`${item.url}${breadcrumbData.searchParams[item.url] || ''}`} className="text-[#ef233c] hover:text-[#e60012]">{item.label}</Link>
+                      <Link to={`${item.url}${breadcrumbData.searchParams[item.url] || ''}`} className="text-[#ef233c] hover:text-[#e60012] dark:text-[#ef233c] dark:hover:text-[#e60012]">{item.label}</Link>
                     </BreadcrumbLink>
                   ) : (
                     <span className="text-muted-foreground cursor-default">
@@ -90,6 +94,22 @@ export function PageHeader() {
             ))}
           </BreadcrumbList>
         </Breadcrumb>
+      </div>
+      
+      <div className="flex items-center px-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="h-9 w-9"
+          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5 text-yellow-500" />
+          ) : (
+            <Moon className="h-5 w-5 text-gray-600" />
+          )}
+        </Button>
       </div>
     </header>
   );

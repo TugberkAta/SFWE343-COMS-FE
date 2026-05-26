@@ -64,7 +64,7 @@ const CoursesPage = () => {
   }
 
   if (coursesLoading || programsLoading) {
-    return <div className="p-6 text-[#111827]">Loading courses...</div>;
+    return <div className="p-6 text-[#111827] dark:text-white">Loading courses...</div>;
   }
 
   if (coursesError || programsError) {
@@ -72,10 +72,10 @@ const CoursesPage = () => {
   }
 
   return (
-    <div className="space-y-8 p-6 bg-[#f8f8f8] min-h-screen">
+    <div className="space-y-8 p-6 bg-white dark:bg-black min-h-screen">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-[#111827]">Courses</h1>
-        <p className="mt-2 text-lg text-[#6b7280]">
+        <h1 className="text-4xl font-bold tracking-tight text-[#111827] dark:text-white">Courses</h1>
+        <p className="mt-2 text-lg text-[#6b7280] dark:text-[#888]">
           {selectedProgram
             ? `Select a course in ${selectedProgram.name}.`
             : "Select a course."}
@@ -86,7 +86,7 @@ const CoursesPage = () => {
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="Search courses..."
-        className="max-w-md bg-white border border-[#e5e7eb] text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2] rounded-lg"
+        className="max-w-md"
       />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 md:grid-cols-2">

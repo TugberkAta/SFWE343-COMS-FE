@@ -38,29 +38,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   });
 
   return (
-    <Sidebar variant="inset" {...props} className="bg-white border-r border-[#e5e7eb]">
-      <SidebarHeader className="bg-white border-b border-[#e5e7eb]">
+    <Sidebar variant="inset" {...props} className="bg-white dark:bg-[#1a1a1a] border-r border-[#e5e7eb] dark:border-[#333]">
+      <SidebarHeader className="bg-white dark:bg-[#1a1a1a] border-b border-[#e5e7eb] dark:border-[#333]">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               asChild
-              className="h-auto py-3 hover:bg-[#f8f8f8] data-[state=open]:bg-[#f8f8f8]"
+              className="h-auto py-3 hover:bg-[#f8f8f8] dark:hover:bg-[#2a2a2a] data-[state=open]:bg-[#f8f8f8] dark:data-[state=open]:bg-[#2a2a2a]"
             >
               <Link to="/admin">
                 <div className="flex flex-col items-center justify-center w-full">
                   <SettingsIcon className="text-[#ef233c]" />
-                  <span className="text-sm font-semibold text-[#111827]">Admin</span>
+                  <span className="text-sm font-semibold text-[#111827] dark:text-white">Admin</span>
                 </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <div className="border-b border-[#e5e7eb] mx-2 mt-2" />
+        <div className="border-b border-[#e5e7eb] dark:border-[#333] mx-2 mt-2" />
       </SidebarHeader>
 
-      <SidebarContent className="bg-white">
+      <SidebarContent className="bg-white dark:bg-[#1a1a1a]">
         {isSettingsSection ? (
           <NavMain items={settingsTabs} />
         ) : (
@@ -77,9 +77,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
       </SidebarContent>
 
-      <div className="border-b border-[#e5e7eb] mx-2 mt-2" />
+      <div className="border-b border-[#e5e7eb] dark:border-[#333] mx-2 mt-2" />
 
-      <SidebarFooter className="bg-white border-t border-[#e5e7eb]">
+      <SidebarFooter className="bg-white dark:bg-[#1a1a1a] border-t border-[#e5e7eb] dark:border-[#333]">
         <NavUser
           user={{
             name: "John Doe",
