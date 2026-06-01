@@ -3,7 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetchData from "@/hooks/use-fetch-data";
-import { getOutlineById } from "@/services/outlines";
+import { getOutlineById, postSubmitOutline, postResubmitOutline } from "@/services/outlines";
+import approvalService from "@/services/approval";
+import ApprovalTimeline from "@/components/approval/ApprovalTimeline";
+import ApprovalComments from "@/components/approval/ApprovalComments";
+import { toast } from "sonner";
 import type {
   OutlineById,
   OutlineContentItem,
@@ -40,6 +44,12 @@ export default function TeacherOutlineDetailsPage() {
     { enabled: isValidOutlineId }
   );
 
+  const [approvalLoading, approvalError, approvalData, refetchApproval] = useFetchData(
+    () => approvalService.getById(outlineId),
+    [outlineId],
+    { enabled: isValidOutlineId }
+  );
+
   if (!hasPermission(ENDPOINT_PERMISSIONS.outlines.READ)) {
     return <PermissionProtectedPage />;
   }
@@ -53,6 +63,43 @@ export default function TeacherOutlineDetailsPage() {
   }
 
   const outline: OutlineById = outlineData.outline;
+
+  const [submitting, setSubmitting] = React.useState(false);
+
+  const workflowStage =
+    approvalData?.workflow?.current_stage || approvalData?.current_stage || approvalData?.currentStage;
+
+  const shouldShowSubmit = !workflowStage || workflowStage === "changes_requested";
+
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+      await postSubmitOutline(outline.outlineId);
+      toast.success("Outline submitted");
+      await refetchApproval();
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit outline");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleResubmit = async () => {
+    try {
+      setSubmitting(true);
+      await postResubmitOutline(outline.outlineId);
+      toast.success("Outline resubmitted");
+      await refetchApproval();
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to resubmit outline");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const sortedLearningOutcomes =
     [...(outline.learningOutcomes || [])].sort((a, b) => Number(a.cloNumber) - Number(b.cloNumber));
@@ -68,9 +115,24 @@ export default function TeacherOutlineDetailsPage() {
             {outline.courseCode} - {outline.courseName}
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate(-1)}>
-          Back
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            Back
+          </Button>
+
+          {/* Lecturer workflow: Submit / Resubmit */}
+          {shouldShowSubmit ? (
+            workflowStage === "changes_requested" ? (
+              <Button onClick={handleResubmit} disabled={submitting}>
+                {submitting ? "Resubmitting…" : "Resubmit"}
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={submitting}>
+                {submitting ? "Submitting…" : "Submit"}
+              </Button>
+            )
+          ) : null}
+        </div>
       </div>
 
       <Card className="border-white/10 bg-[#141414]">
@@ -192,6 +254,31 @@ export default function TeacherOutlineDetailsPage() {
               <p className={keyValueClassName}>Count: {item.count}</p>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card className="border-white/10 bg-[#141414]">
+        <CardHeader>
+          <CardTitle>Approval History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {approvalLoading ? (
+            <div>Loading approval data…</div>
+          ) : approvalError ? (
+            <div className="text-red-400">Failed to load approval data</div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium">Timeline</h3>
+                <ApprovalTimeline events={approvalData?.timeline || approvalData?.events} />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium">Comments</h3>
+                <ApprovalComments comments={approvalData?.comments || []} />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

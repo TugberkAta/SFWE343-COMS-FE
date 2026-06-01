@@ -12,6 +12,8 @@ import FacultiesPage from "@/app/(adminPanel)/faculties/page";
 import ProgramsPage from "@/app/(adminPanel)/programs/page";
 import CoursesPage from "@/app/(adminPanel)/courses/page";
 import TeacherOutlineDetailsPage from "@/app/(adminPanel)/teacher-outlines/details/page";
+import Stage1ReviewPage from "@/app/(adminPanel)/admin/outline-review/stage-1/page";
+import Stage2ApprovalPage from "@/app/(adminPanel)/admin/outline-review/stage-2/page";
 import { paths } from "@/utils/paths";
 
 export const AppRoutes = () => {
@@ -30,6 +32,8 @@ export const AppRoutes = () => {
         <Route index element={<FacultiesPage />} />
         <Route path="teacher-outlines" element={<TeacherOutlinesPage />} />
         <Route path="teacher-outlines/:outlineId" element={<TeacherOutlineDetailsPage />} />
+        <Route path="outline-review/stage-1" element={<Stage1ReviewPage />} />
+        <Route path="outline-review/stage-2" element={<Stage2ApprovalPage />} />
         <Route path="faculties" element={<FacultiesPage />} />
         <Route path="programs" element={<ProgramsPage />} />
         <Route path="courses" element={<CoursesPage />} />
