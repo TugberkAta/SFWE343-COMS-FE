@@ -5,8 +5,6 @@ import getOutlinePdfById from "./get-outline-pdf-by-id";
 import deleteOutlineById from "./delete-outline-by-id";
 import getOutlineById from "./get-outline-by-id";
 import patchCourseOutline from "./patch-course-outline";
-import postSubmitOutline from "./post-submit";
-import postResubmitOutline from "./post-resubmit";
 
 export type Outline = {
   outlineId: number;
@@ -37,4 +35,4 @@ export const getOutlines = () => {
   return http.get<OutlinesResponse>(`${apiBaseUrl}${endpoint}`);
 };
 
-export { postCourseOutline, patchCourseOutline, getOutlinePdfById, deleteOutlineById, getOutlineById, postSubmitOutline, postResubmitOutline };
+export { postCourseOutline, patchCourseOutline, getOutlinePdfById, deleteOutlineById, getOutlineById };
