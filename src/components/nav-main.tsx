@@ -26,6 +26,8 @@ interface NavMainProps {
     icon?: LucideIcon;
     isActive?: boolean;
     elementLinkId: string;
+    permission?: string;
+    permissions?: string[];
     items?: {
       title: string;
       url: string;

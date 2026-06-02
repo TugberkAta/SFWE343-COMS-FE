@@ -7,6 +7,7 @@ import {
   User,
   Users,
   Shield,
+  ClipboardCheck,
 } from "lucide-react";
 
 export interface NavMainItem {
@@ -16,6 +17,7 @@ export interface NavMainItem {
   isActive?: boolean;
   elementLinkId: string;
   permission?: string;
+  permissions?: string[];
   items?: {
     title: string;
     url: string;
@@ -37,6 +39,26 @@ export const getMainNavigation = (): NavMainItem[] => {
       icon: Users,
       elementLinkId: "teacher-outlines-link",
       permission: ENDPOINT_PERMISSIONS.outlines.READ,
+    },
+    {
+      title: "Outline Review",
+      url: paths.admin.outlineReviewStage1,
+      icon: ClipboardCheck,
+      elementLinkId: "outline-review-link",
+      permissions: [
+        ENDPOINT_PERMISSIONS.approval.STAGE1,
+        ENDPOINT_PERMISSIONS.approval.STAGE2,
+      ],
+      items: [
+        {
+          title: "Stage 1 Review",
+          url: paths.admin.outlineReviewStage1,
+        },
+        {
+          title: "Stage 2 Approval",
+          url: paths.admin.outlineReviewStage2,
+        },
+      ],
     },
     {
       title: "Pending Users",

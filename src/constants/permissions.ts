@@ -30,4 +30,10 @@ export const ENDPOINT_PERMISSIONS = {
   terms: {
     READ: "terms.read",
   },
+  approval: {
+    STAGE1: "approval.stage1",
+    STAGE1_APPROVE: "approval.stage1.approve",
+    STAGE2: "approval.stage2",
+    STAGE2_APPROVE: "approval.stage2.approve",
+  },
 } as const;

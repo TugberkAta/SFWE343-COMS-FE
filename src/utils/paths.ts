@@ -5,6 +5,8 @@ export const paths = {
     usersWithRole: "/admin/users-with-role",
     userTypes: "/admin/user-types",
     teacherOutlines: "/admin/teacher-outlines",
+    outlineReviewStage1: "/admin/outline-review/stage-1",
+    outlineReviewStage2: "/admin/outline-review/stage-2",
     courses: "/admin/courses",
     settings: {
       account: "/admin/settings/account",

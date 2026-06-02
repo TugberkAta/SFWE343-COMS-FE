@@ -31,6 +31,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const settingsTabs = getSettingsNavigation();
 
   const filteredMainTabs = mainTabs.filter((item) => {
+    if (item.permissions?.length) {
+      return item.permissions.some((permission) => hasPermission(permission));
+    }
     if (item.permission) {
       return hasPermission(item.permission);
     }
