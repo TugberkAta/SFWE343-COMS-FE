@@ -9,6 +9,10 @@ vi.mock("@/services/users/post-reject-user", () => ({
   default: mockPostRejectUser,
 }));
 
+vi.mock("@/components/PermissionGate", () => ({
+  PermissionGate: ({ children }: any) => <>{children}</>,
+}));
+
 const mockUser: import("@/types/user-with-no-role").UserWithNoRole = {
   userId: 1,
   firstName: "John",

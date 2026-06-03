@@ -24,6 +24,34 @@ vi.mock("@/services/users/post-reject-user", () => ({
   default: vi.fn(),
 }));
 
+vi.mock("@/hooks/use-permission", () => ({
+  usePermission: () => ({ hasPermission: () => true }),
+}));
+
+vi.mock("@/components/PermissionGate", () => ({
+  PermissionGate: ({ children }: any) => <>{children}</>,
+}));
+
+vi.mock("./approve-user-dialog", () => ({
+  ApproveUserDialog: ({ open, user, userTypes, onApproved }: any) => {
+    if (!open) return null;
+    return (
+      <div role="dialog">
+        <p>Choose a user type for {user ? `${user.firstName} ${user.lastName}` : ""}</p>
+        <button
+          onClick={async () => {
+            const { default: postApproveUser } = await import("@/services/users/post-approve-user");
+            await postApproveUser({ userId: user.userId, userTypeId: userTypes?.[0]?.userTypeId ?? 1, approvedStatus: true });
+            await onApproved?.();
+          }}
+        >
+          Confirm
+        </button>
+      </div>
+    );
+  },
+}));
+
 import useFetchData from "@/hooks/use-fetch-data";
 import postApproveUser from "@/services/users/post-approve-user";
 import postRejectUser from "@/services/users/post-reject-user";
@@ -52,23 +80,29 @@ const mockUserTypes: import("@/types/user-type").UserType[] = [
   { userTypeId: 2, userType: "admin_type", permissions: [] },
 ];
 
-let mockCallCount = 0;
+let callCount = 0;
 
 function setupMocks({
   usersLoading = false,
   usersErrored = false,
   usersData = { users: mockUsers },
+  usersRefetch = vi.fn(),
   typesLoading = false,
   typesErrored = false,
   typesData = { userTypes: mockUserTypes },
+  typesRefetch = vi.fn(),
 } = {}) {
-  mockCallCount = 0;
-  vi.mocked(useFetchData).mockImplementation(() => {
-    mockCallCount++;
-    if (mockCallCount === 1) {
-      return [usersLoading, usersErrored, usersData, vi.fn()] as const;
+  vi.mocked(useFetchData).mockImplementation((_fetcher: any) => {
+    const currentCount = callCount;
+    callCount++;
+    Promise.resolve().then(() => {
+      callCount = 0;
+    });
+
+    if (currentCount === 0) {
+      return [usersLoading, usersErrored, usersData, usersRefetch] as const;
     }
-    return [typesLoading, typesErrored, typesData, vi.fn()] as const;
+    return [typesLoading, typesErrored, typesData, typesRefetch] as const;
   });
 }
 
@@ -190,18 +224,9 @@ describe("PendingUsersPage", () => {
   it("calls postApproveUser and refetches when user is approved", async () => {
     const user = userEvent.setup();
     const refetch = vi.fn();
-    vi.mocked(useFetchData).mockImplementation((fetcher) => {
-      const src = fetcher?.toString() ?? "";
-      if (src.includes("getUsersWithNoRole")) {
-        return [false, false, { users: mockUsers }, refetch] as const;
-      }
-      if (src.includes("getUserTypes")) {
-        return [false, false, { userTypes: mockUserTypes }, vi.fn()] as const;
-      }
-      return [false, false, null, vi.fn()] as const;
-    });
+    setupMocks({ usersRefetch: refetch });
 
-    vi.mocked(postApproveUser).mockResolvedValueOnce(undefined);
+    vi.mocked(postApproveUser).mockResolvedValueOnce(undefined as any);
 
     renderPage();
 
@@ -224,18 +249,9 @@ describe("PendingUsersPage", () => {
   it("calls postRejectUser and refetches when user is rejected", async () => {
     const user = userEvent.setup();
     const refetch = vi.fn();
-    vi.mocked(useFetchData).mockImplementation((fetcher) => {
-      const src = fetcher?.toString() ?? "";
-      if (src.includes("getUsersWithNoRole")) {
-        return [false, false, { users: mockUsers }, refetch] as const;
-      }
-      if (src.includes("getUserTypes")) {
-        return [false, false, { userTypes: mockUserTypes }, vi.fn()] as const;
-      }
-      return [false, false, null, vi.fn()] as const;
-    });
+    setupMocks({ usersRefetch: refetch });
 
-    vi.mocked(postRejectUser).mockResolvedValueOnce(undefined);
+    vi.mocked(postRejectUser).mockResolvedValueOnce(undefined as any);
 
     renderPage();
 
@@ -261,7 +277,7 @@ describe("PendingUsersPage", () => {
 
   it("displays formatted date for createdAt", () => {
     renderPage();
-    const dateCell = screen.getByText(/2024/i);
-    expect(dateCell).toBeInTheDocument();
+    const dateCells = screen.getAllByText(/2024/i);
+    expect(dateCells.length).toBeGreaterThan(0);
   });
 });

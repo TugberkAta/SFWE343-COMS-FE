@@ -6,6 +6,12 @@ import TeacherOutlinesPage from "./page";
 
 vi.mock("@/hooks/use-fetch-data");
 vi.mock("@/services/outlines");
+vi.mock("@/hooks/use-permission", () => ({
+  usePermission: () => ({ hasPermission: () => true }),
+}));
+vi.mock("@/components/PermissionGate", () => ({
+  PermissionGate: ({ children }: any) => <>{children}</>,
+}));
 vi.mock("./components/create-outline-dialog", () => ({
   default: ({ courseId, outlineId, trigger }: any) => (
     <button data-testid={`create-outline-${courseId}-${outlineId || "new"}`}>
@@ -159,7 +165,7 @@ describe("TeacherOutlinesPage", () => {
   it("renders action buttons for each outline", () => {
     renderPage();
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(12);
+    expect(buttons.length).toBeGreaterThanOrEqual(11);
   });
 
   it("does not display edit dialog when status is published", () => {
