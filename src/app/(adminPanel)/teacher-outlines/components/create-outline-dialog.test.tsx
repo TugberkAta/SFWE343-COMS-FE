@@ -130,8 +130,19 @@ vi.mock("react-hook-form", () => ({
     formState: { errors: {} },
     watch: (name: string) => {
       if (name === "courseId") return 100;
-      if (name === "evaluationItems") return [];
-      if (name === "workloadItems") return [];
+      if (name === "evaluationItems") return [{ title: "", count: 1, weight: 0 }];
+      if (name === "workloadItems") return [{ activity: "", hours: 0 }];
+      if (name === "learningOutcomes") return Array(5).fill(null).map((_, i) => ({
+        cloCode: `CLO-${i + 1}`,
+        description: "",
+      }));
+      if (name === "weeklyTopics") return [{
+        weekNo: 1,
+        subjectTitle: "",
+        detailsText: "",
+        tasksPrivateStudyText: "",
+        clos: [],
+      }];
       return undefined;
     },
     setValue: vi.fn(),
