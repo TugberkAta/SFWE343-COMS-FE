@@ -13,37 +13,19 @@ import { Eye, Pencil, Trash2, Download } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import useFetchData from "@/hooks/use-fetch-data";
-import { deleteOutlineById, getOutlinePdfById, getOutlines } from "@/services/outlines";
+import {
+  deleteOutlineById,
+  getOutlinePdfById,
+  getOutlines,
+  type Outline,
+} from "@/services/outlines";
 import CreateOutlineDialog from "./components/create-outline-dialog";
 import { usePermission } from "@/hooks/use-permission";
 import { ENDPOINT_PERMISSIONS } from "@/constants/permissions";
+import { isOutlineEditable } from "@/constants/outlines";
+import OutlineStatusBadge from "@/components/outlines/outline-status-badge";
 import { PermissionGate } from "@/components/PermissionGate";
 import { PermissionProtectedPage } from "@/components/PermissionProtectedPage";
-
-type Outline = {
-  outlineId: number;
-  courseCode: string;
-  courseName: string;
-  programName: string;
-  departmentName: string;
-  academicYear: string;
-  semester: string;
-  status: "published" | "pending" | "draft";
-};
-
-function StatusBadge({ status }: { status: Outline["status"] }) {
-  const styles = {
-    published: "bg-green-500/10 text-green-400 border border-green-500/20",
-    pending: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-    draft: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
-  };
-
-  return (
-    <span className={`px-2 py-1 text-xs rounded-md ${styles[status]}`}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
-  );
-}
 
 export default function TeacherOutlinesPage() {
   const navigate = useNavigate();
@@ -159,7 +141,7 @@ export default function TeacherOutlinesPage() {
             </TableHeader>
 
             <TableBody>
-              {filteredOutlines.map((item: any) => (
+              {filteredOutlines.map((item: Outline) => (
                 <TableRow key={item.outlineId} className="border-white/10">
                   <TableCell>{item.courseCode}</TableCell>
                   <TableCell>{item.courseName}</TableCell>
@@ -168,7 +150,10 @@ export default function TeacherOutlinesPage() {
                   <TableCell>{item.academicYear}</TableCell>
                   <TableCell>{item.semester}</TableCell>
                   <TableCell>
-                    <StatusBadge status={item.status} />
+                    <OutlineStatusBadge
+                      status={item.status}
+                      currentStage={item.currentStage}
+                    />
                   </TableCell>
 
                   <TableCell className="flex justify-end gap-2">
@@ -180,7 +165,7 @@ export default function TeacherOutlinesPage() {
                       <Eye size={16} />
                     </Button>
 
-                    {item.status !== "published" ? (
+                    {isOutlineEditable(item) ? (
                       <PermissionGate permission={ENDPOINT_PERMISSIONS.outlines.EDIT}>
                         <CreateOutlineDialog
                           courseId={item.courseId}

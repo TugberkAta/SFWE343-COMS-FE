@@ -11,7 +11,7 @@ export type Outline = {
   courseId: number;
   termId: number;
   versionNo: number;
-  status: "published" | "pending" | "draft";
+  status: string;
   createdAt: string;
   updatedAt: string;
   courseCode: string;
@@ -22,6 +22,14 @@ export type Outline = {
   departmentName: string;
   academicYear: string;
   semester: string;
+  workflowId?: number | null;
+  currentStage?: string | null;
+  submissionCount?: number | null;
+  stage1ReviewerUserId?: number | null;
+  stage1ReviewedAt?: string | null;
+  stage2ApproverUserId?: number | null;
+  stage2ApprovedAt?: string | null;
+  finalApprovedAt?: string | null;
 };
 
 export type OutlinesResponse = {

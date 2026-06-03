@@ -12,6 +12,8 @@ import FacultiesPage from "@/app/(adminPanel)/faculties/page";
 import ProgramsPage from "@/app/(adminPanel)/programs/page";
 import CoursesPage from "@/app/(adminPanel)/courses/page";
 import TeacherOutlineDetailsPage from "@/app/(adminPanel)/teacher-outlines/details/page";
+import Stage1ReviewPage from "@/app/(adminPanel)/admin/outline-review/stage-1/page";
+import Stage2ApprovalPage from "@/app/(adminPanel)/admin/outline-review/stage-2/page";
 import { paths } from "@/utils/paths";
 
 export const AppRoutes = () => {
@@ -36,6 +38,14 @@ export const AppRoutes = () => {
         <Route path="pending-users" element={<PendingUsersPage />} />
         <Route path="users-with-role" element={<UsersWithRolePage />} />
         <Route path="user-types" element={<UserTypesPage />} />
+        <Route
+          path="outline-review/stage-1"
+          element={<Stage1ReviewPage />}
+        />
+        <Route
+          path="outline-review/stage-2"
+          element={<Stage2ApprovalPage />}
+        />
         <Route path="settings/account" element={<SettingsAccountPage />} />
       </Route>
 

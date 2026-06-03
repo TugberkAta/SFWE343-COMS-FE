@@ -131,10 +131,10 @@ describe("TeacherOutlinesPage", () => {
     expect(rows.length).toBe(4);
   });
 
-  it("shows edit button only for non-published outlines", () => {
+  it("shows edit button only for editable outlines", () => {
     renderPage();
     const editButtons = screen.getAllByTestId(/create-outline-\d+-\d+$/);
-    expect(editButtons.length).toBe(2);
+    expect(editButtons.length).toBe(1);
   });
 
   it("renders the card with correct title and description", () => {
