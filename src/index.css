@@ -77,37 +77,39 @@
 }
 
 .dark {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Layered charcoal dark tokens (source-of-truth for dark theme) */
+  --layer-0: #000000; /* Global background */
+  --layer-1: #1E1E1E; /* Cards, sidebars, containers */
+  --layer-2: #141414; /* Inputs & nested elements */
+  --layer-2-border: #2E2E32; /* subtle gray border for inputs */
+  --text-main: #FFFFFF; /* primary typography */
+  --text-secondary: #A1A1AA; /* secondary / placeholder text */
+
+  /* Backwards-compatible tokens used elsewhere in the theme */
+  --background: var(--layer-0);
+  --foreground: var(--text-main);
+  --card: var(--layer-1);
+  --card-foreground: var(--text-main);
+  --popover: var(--layer-1);
+  --popover-foreground: var(--text-main);
+  --primary: var(--text-main);
+  --primary-foreground: #000000;
+  --secondary: #161616;
+  --secondary-foreground: var(--text-secondary);
+  --muted: #161616;
+  --muted-foreground: var(--text-secondary);
+  --accent: #ef233c; /* preserve red accent */
+  --accent-foreground: #ffffff;
+  --destructive: #ffffff;
+  --border: var(--layer-2-border);
+  --input: var(--layer-2);
+  --ring: rgba(255,255,255,0.06);
+  --sidebar: var(--layer-1);
+  --sidebar-foreground: var(--text-main);
+  --sidebar-primary: var(--text-main);
+  --sidebar-primary-foreground: #000000;
+  --sidebar-border: var(--layer-2-border);
+  --sidebar-ring: rgba(255,255,255,0.08);
 }
 
 @layer base {
@@ -117,4 +119,122 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Dark mode scrollbar polish */
+  .dark::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  .dark::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .dark::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  .dark::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.10);
+  }
+
+html.dark {
+  --dm-page-bg: var(--layer-0);
+  --dm-card-bg: var(--layer-1);
+  --dm-sidebar-bg: var(--layer-1);
+  --dm-input-bg: var(--layer-2);
+  --dm-text-main: var(--text-main);
+  --dm-text-muted: var(--text-secondary);
+  --dm-border: var(--layer-2-border);
+  --dm-accent: #ef233c;
 }
+
+html.dark body,
+html.dark .main-content,
+html.dark .page-wrapper { background: var(--dm-page-bg) !important; color: var(--dm-text-main) !important; }
+
+html.dark .sidebar,
+html.dark nav,
+html.dark aside { background: var(--dm-sidebar-bg) !important; border-color: rgba(255,255,255,0.06) !important; }
+
+html.dark .card,
+html.dark [class*="card"],
+html.dark [class*="faculty"] { background: var(--dm-card-bg) !important; border-color: rgba(255,255,255,0.06) !important; color: var(--dm-text-main) !important; }
+
+html.dark input,
+html.dark textarea,
+html.dark select,
+html.dark input[type="search"],
+html.dark input[type="text"] { background: var(--dm-input-bg) !important; color: var(--dm-text-main) !important; border-color: var(--dm-border) !important; }
+
+html.dark p,
+html.dark span,
+html.dark h1, html.dark h2, html.dark h3,
+html.dark h4, html.dark h5, html.dark h6 { color: var(--dm-text-main); }
+
+html.dark .text-muted,
+html.dark .muted,
+html.dark [class*="subtitle"],
+html.dark [class*="description"] { color: var(--dm-text-muted) !important; }
+
+/* Keep the red accent — do NOT override it */
+html.dark [class*="badge"],
+html.dark [class*="tag"],
+html.dark [class*="undergraduate"] { /* leave color as-is, just fix background if needed */ }
+
+/* Toggle button (add to HTML manually) */
+/* 🌙 */
+
+/* Auto-apply saved theme on load — add to  as inline
+
+  /* Global dark-mode normalization: remap common light-mode color utility classes to monochrome equivalents.
+     This keeps light-mode classes untouched and only affects visuals when `.dark` is present. */
+  .dark [class*="bg-white"] {
+    background-color: var(--card) !important;
+  }
+  .dark [class*="bg-[#f8fafc]"] {
+    background-color: var(--card) !important;
+  }
+  .dark [class*="bg-[#fff1f2]"] {
+    background-color: var(--card) !important;
+  }
+  .dark [class*="bg-[#f8f8f8]"] {
+    background-color: var(--card) !important;
+  }
+
+  .dark [class*="bg-gradient-to-br"] {
+    background-image: none !important;
+    background-color: var(--card) !important;
+  }
+
+  .dark [class*="text-[#111827]"] {
+    color: var(--foreground) !important;
+  }
+  .dark [class*="text-[#6b7280]"] {
+    color: var(--muted-foreground) !important;
+  }
+
+  .dark [class*="border-[#e5e7eb]"] {
+    border-color: var(--border) !important;
+  }
+
+  /* map explicit black borders used in some components to the charcoal border token */
+  .dark [class*="border-black"],
+  .dark .border-black {
+    border-color: var(--dm-border) !important;
+  }
+
+  /* Preserve red accent styling in dark mode so highlights remain visible */
+
+  /* Normalize hover background utilities that reference light grays */
+  .dark [class*="hover:bg-[#f8f8f8]"]:hover,
+  .dark [class*="hover:bg-[#f8fafc]"]:hover,
+  .dark [class*="hover:bg-[#fff1f2]"]:hover {
+    background-color: rgba(255,255,255,0.02) !important;
+  }
+}
+
+/* Page background, cards, sidebar, inputs and muted text are handled above
+   via the `--dm-*` variables and specific selectors. This section intentionally
+   avoids overriding light-mode classes and only maps dark-mode visuals. */
+

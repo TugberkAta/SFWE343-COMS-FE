@@ -75,7 +75,7 @@ export const CustomDialogContent = ({
                     <Circle
                       className={cn(
                         "w-4 h-4 text-[#d1d5db]",
-                        currentTab === tab.name && "text-[#ef233c]"
+                        currentTab === tab.name && "text-[#ef233c] dark:text-[var(--text-main)]"
                       )}
                     />
                     <p className={cn("text-sm font-bold", currentTab === tab.name ? "text-[#111827]" : "text-[#6b7280]")}>{tab.name}</p>

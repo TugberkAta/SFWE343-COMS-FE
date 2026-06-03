@@ -88,7 +88,7 @@ export default function UserTypesPage() {
         <PermissionGate permission={ENDPOINT_PERMISSIONS.userTypes.WRITE}>
           <Button 
             onClick={() => setCreateDialogOpen(true)}
-            className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium"
+            className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium dark:text-[var(--text-main)]"
           >
             <Plus className="mr-2 size-4" />
             Create User Type
@@ -124,7 +124,7 @@ export default function UserTypesPage() {
                         {userType.permissions.slice(0, 3).map((perm) => (
                           <span
                             key={perm}
-                            className="inline-flex items-center rounded-full bg-[#fff1f2] px-2 py-1 text-xs font-medium text-[#ef233c] border border-[#fce4ec]"
+                            className="inline-flex items-center rounded-full bg-[#fff1f2] px-2 py-1 text-xs font-medium text-[#ef233c] border border-[#fce4ec] dark:bg-[var(--layer-1)] dark:border-[var(--layer-2-border)] dark:text-[var(--text-main)]"
                           >
                             {perm}
                           </span>
@@ -143,7 +143,7 @@ export default function UserTypesPage() {
                             size="icon"
                             variant="ghost"
                             onClick={() => setEditDialog({ open: true, userType })}
-                            className="text-[#ef233c] hover:bg-[#fff1f2]"
+                            className="text-[#ef233c] hover:bg-[#fff1f2] dark:text-[var(--text-main)] dark:hover:bg-[var(--layer-2)]"
                           >
                             <Pencil className="size-4" />
                           </Button>

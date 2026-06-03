@@ -41,10 +41,10 @@ export default function EmailAuthPage() {
   });
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 bg-white dark:bg-black">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 bg-white dark:bg-[var(--layer-0)]">
       <div className="flex w-full max-w-md flex-col gap-6">
         <div className={cn("flex flex-col gap-6")}>
-          <Card className="dark:bg-[#1a1a1a] dark:border-[#333]">
+          <Card className="dark:bg-[var(--layer-1)] dark:border-[var(--layer-2-border)]">
             <CardHeader className="text-center p-6">
               <div className="flex flex-col items-center gap-3 mb-2">
                 <img 
@@ -53,15 +53,15 @@ export default function EmailAuthPage() {
                   className="h-24 w-auto"
                 />
                 <div>
-                  <h2 className="text-lg font-bold text-[#111827] dark:text-white">
+                  <h2 className="text-lg font-bold text-[#111827] dark:text-[var(--text-main)]">
                     Final International University
                   </h2>
-                  <p className="text-sm text-[#6b7280] dark:text-[#888]">
+                  <p className="text-sm text-[#6b7280] dark:text-[var(--text-secondary)]">
                     Course Outline Management System
                   </p>
                 </div>
               </div>
-              <CardTitle className="text-xl text-[#111827] dark:text-white mt-4">Create an Account</CardTitle>
+              <CardTitle className="text-xl text-[#111827] dark:text-[var(--text-main)] mt-4">Create an Account</CardTitle>
             </CardHeader>
             <CardContent className="px-8">
               <Form {...form}>
@@ -72,7 +72,7 @@ export default function EmailAuthPage() {
                       name="email"
                       render={({ field }) => (
                         <div className="grid gap-2">
-                          <Label htmlFor="email" className="text-[#111827] dark:text-white">Email</Label>
+                          <Label htmlFor="email" className="text-[#111827] dark:text-[var(--text-main)]">Email</Label>
                           <FormControl>
                             <Input
                               {...field}
@@ -95,11 +95,11 @@ export default function EmailAuthPage() {
                 </form>
 
                 <div className="text-center mt-4">
-                  <p className="text-[#111827] dark:text-[#888]">
+                  <p className="text-[#111827] dark:text-[var(--text-secondary)]">
                     Already have an account?{" "}
                     <Link
                       to="/login"
-                      className="text-[#ef233c] hover:text-[#e60012] font-medium"
+                      className="text-[#ef233c] hover:text-[#e60012] font-medium dark:text-[var(--text-main)] dark:hover:text-[var(--text-secondary)]"
                     >
                       Sign in
                     </Link>

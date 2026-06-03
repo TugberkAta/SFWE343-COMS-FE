@@ -121,11 +121,11 @@ export default function TeacherOutlinesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 bg-[#f8f8f8] min-h-screen">
+    <div className="p-6 space-y-6 bg-[#f8f8f8] dark:bg-[var(--layer-0)] min-h-screen">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#111827]">Course Outlines</h1>
-          <p className="text-sm text-[#6b7280]">Manage your course outlines</p>
+          <h1 className="text-2xl font-semibold text-[#111827] dark:text-[var(--text-main)]">Course Outlines</h1>
+          <p className="text-sm text-[#6b7280] dark:text-[var(--text-secondary)]">Manage your course outlines</p>
         </div>
 
         <div className="flex gap-2">
@@ -176,7 +176,7 @@ export default function TeacherOutlinesPage() {
                       size="icon"
                       variant="ghost"
                       onClick={() => navigate(`/admin/teacher-outlines/${item.outlineId}`)}
-                      className="text-[#ef233c] hover:bg-[#fff1f2]"
+                      className="text-[#ef233c] hover:bg-[#fff1f2] dark:text-[var(--text-main)] dark:hover:bg-[var(--layer-2)]"
                     >
                       <Eye size={16} />
                     </Button>
@@ -187,7 +187,7 @@ export default function TeacherOutlinesPage() {
                           courseId={item.courseId}
                           outlineId={item.outlineId}
                           trigger={
-                            <Button size="icon" variant="ghost" className="text-[#ef233c] hover:bg-[#fff1f2]">
+                            <Button size="icon" variant="ghost" className="text-[#ef233c] hover:bg-[#fff1f2] dark:text-[var(--text-main)] dark:hover:bg-[var(--layer-2)]">
                               <Pencil size={16} />
                             </Button>
                           }

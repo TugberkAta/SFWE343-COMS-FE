@@ -57,7 +57,7 @@ export function NavMain({ items, label }: NavMainProps) {
                 <SidebarMenuButton 
                   asChild 
                   tooltip={item.title}
-                  className={isItemActive ? "bg-[#ef233c] text-white hover:bg-[#e60012]" : "text-[#374151] dark:text-[#888] hover:bg-[#fff1f2] dark:hover:bg-[#2a2a2a] hover:text-[#ef233c]"}
+                  className={isItemActive ? "bg-[#ef233c] text-white hover:bg-[#e60012] dark:bg-[var(--dm-accent)] dark:text-[var(--text-main)] dark:hover:bg-[var(--dm-accent)]" : "text-[#374151] dark:text-[var(--text-secondary)] hover:bg-[#fff1f2] dark:hover:bg-[rgba(255,255,255,0.02)] hover:text-[#ef233c] dark:hover:text-[var(--text-main)]"}
                 >
                   {item.items?.length ? (
                     <CollapsibleTrigger asChild>
@@ -88,8 +88,8 @@ export function NavMain({ items, label }: NavMainProps) {
                 {item.items?.length ? (
                   <>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuAction className={isItemActive ? "text-white" : "text-[#374151] dark:text-[#888]"}>
-                        <ChevronRight className={isItemActive ? "text-white" : "text-[#374151] dark:text-[#888]"} />
+                      <SidebarMenuAction className={isItemActive ? "text-white" : "text-[#374151] dark:text-[var(--text-secondary)]"}>
+                        <ChevronRight className={isItemActive ? "text-white" : "text-[#374151] dark:text-[var(--text-secondary)]"} />
                         <span className="sr-only">Toggle</span>
                       </SidebarMenuAction>
                     </CollapsibleTrigger>
@@ -100,7 +100,7 @@ export function NavMain({ items, label }: NavMainProps) {
                             <SidebarMenuSubButton
                               asChild
                               data-active={subItem.url === pathname}
-                              className={subItem.url === pathname ? "bg-[#ef233c] text-white hover:bg-[#e60012]" : "text-[#374151] dark:text-[#888] hover:bg-[#fff1f2] dark:hover:bg-[#2a2a2a] hover:text-[#ef233c]"}
+                              className={subItem.url === pathname ? "bg-[#ef233c] text-white hover:bg-[#e60012] dark:bg-[var(--dm-accent)] dark:text-[var(--text-main)] dark:hover:bg-[var(--dm-accent)]" : "text-[#374151] dark:text-[var(--text-secondary)] hover:bg-[#fff1f2] dark:hover:bg-[rgba(255,255,255,0.02)] hover:text-[#ef233c] dark:hover:text-[var(--text-main)]"}
                             >
                               <Link to={subItem.url}>
                                 <span>{subItem.title}</span>

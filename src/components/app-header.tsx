@@ -65,12 +65,12 @@ export function PageHeader() {
   }, [pathSegments, breadcrumbData.rules, breadcrumbData.labels]);
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 bg-white dark:bg-[#1a1a1a] border-b border-[#e5e7eb] dark:border-[#333]">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-2 bg-white dark:bg-[var(--layer-1)] border-b border-[#e5e7eb] dark:border-[var(--layer-2-border)]">
       <div className="flex items-center gap-2 px-4">
-        <SidebarTrigger className="-ml-1 text-[#111827] dark:text-white" />
+        <SidebarTrigger className="-ml-1 text-[#111827] dark:text-[var(--text-main)]" />
         <Separator
           orientation="vertical"
-          className="mr-2 data-[orientation=vertical]:h-4 bg-[#e5e7eb] dark:bg-[#333]"
+          className="mr-2 data-[orientation=vertical]:h-4 bg-[#e5e7eb] dark:bg-[var(--layer-2-border)]"
         />
         <Breadcrumb>
           <BreadcrumbList>
@@ -78,10 +78,10 @@ export function PageHeader() {
               <Fragment key={item.url}>
                 <BreadcrumbItem>
                   {index === breadcrumbItems.length - 1 ? (
-                    <BreadcrumbPage className="text-[#111827] dark:text-white">{item.label}</BreadcrumbPage>
-                  ) : item.isValid ? (
+                    <BreadcrumbPage className="text-[#111827] dark:text-[var(--text-main)]">{item.label}</BreadcrumbPage>
+                    ) : item.isValid ? (
                     <BreadcrumbLink asChild>
-                      <Link to={`${item.url}${breadcrumbData.searchParams[item.url] || ''}`} className="text-[#ef233c] hover:text-[#e60012] dark:text-[#ef233c] dark:hover:text-[#e60012]">{item.label}</Link>
+                      <Link to={`${item.url}${breadcrumbData.searchParams[item.url] || ''}`} className="text-[#ef233c] hover:text-[#e60012] dark:text-[var(--text-main)] dark:hover:text-[var(--text-secondary)]">{item.label}</Link>
                     </BreadcrumbLink>
                   ) : (
                     <span className="text-muted-foreground cursor-default">

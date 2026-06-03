@@ -1259,7 +1259,7 @@ export default function CreateOutlineDialog({ courseId, outlineId, trigger }: Cr
                     type="file"
                     accept=".csv,text/csv"
                     onChange={handleWeeklyTopicsCsvFileChange}
-                    className="w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] file:mr-3 file:rounded file:border-0 file:bg-[#ef233c] file:px-3 file:py-1.5 file:text-white hover:file:bg-[#e60012]"
+                    className="w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] file:mr-3 file:rounded file:border-0 file:bg-[#ef233c] file:px-3 file:py-1.5 file:text-white hover:file:bg-[#e60012] dark:file:bg-[var(--layer-2)] dark:hover:file:bg:[var(--layer-2)] dark:file:text-[var(--text-main)]"
                   />
                   <div className="rounded-md border border-[#e5e7eb] bg-[#f8fafc] p-3">
                     <p className="text-xs font-medium text-[#111827]">CSV Example Structure</p>

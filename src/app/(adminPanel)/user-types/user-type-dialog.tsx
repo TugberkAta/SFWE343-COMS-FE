@@ -124,7 +124,7 @@ export function UserTypeDialog({
                       placeholder="e.g., Teacher, Admin, Coordinator"
                       {...field}
                       disabled={form.formState.isSubmitting}
-                      className="bg-white border border-[#e5e7eb] rounded-lg text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2]"
+                      className="bg-white border border-[#e5e7eb] rounded-lg text-[#111827] placeholder-[#6b7280] focus:border-[#ef233c] focus:ring-2 focus:ring-[#fff1f2] dark:focus:border-white dark:focus:ring-white"
                     />
                   </FormControl>
                   <FormMessage className="text-red-600" />
@@ -194,7 +194,7 @@ export function UserTypeDialog({
               <Button 
                 type="submit" 
                 disabled={form.formState.isSubmitting}
-                className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium disabled:opacity-50"
+                className="bg-[#ef233c] hover:bg-[#e60012] text-white rounded-lg font-medium disabled:opacity-50 dark:text-[var(--text-main)]"
               >
                 {form.formState.isSubmitting ? "Saving..." : isEdit ? "Update" : "Create"}
               </Button>

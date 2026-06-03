@@ -64,7 +64,7 @@ const FacultiesPage = () => {
           className="h-14 w-auto"
         />
         <div>
-          <h2 className="text-2xl font-bold text-[#111827] dark:text-white">
+          <h2 className="text-2xl font-bold text-[#111827] dark:text-[var(--text-main)]">
             Final International University
           </h2>
           <p className="text-sm text-[#6b7280] dark:text-[#888]">
@@ -74,7 +74,7 @@ const FacultiesPage = () => {
       </div>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#111827] dark:text-white">
+        <h1 className="text-3xl font-bold tracking-tight text-[#111827] dark:text-[var(--text-main)]">
           Faculties
         </h1>
         <p className="mt-2 text-sm text-[#6b7280] dark:text-[#888]">
@@ -86,7 +86,7 @@ const FacultiesPage = () => {
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="Search faculties..."
-        className="max-w-md"
+        className="max-w-md bg-white dark:bg-white border border-[#e5e7eb] rounded-md"
       />
 
       <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

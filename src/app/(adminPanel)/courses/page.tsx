@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { FacultyProgramCard } from "@/components/FacultyProgramCard";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/contexts/breadcrumb-context";
 import useFetchData from "@/hooks/use-fetch-data";
 import { getCourses, type Course } from "@/services/courses";
@@ -64,7 +65,7 @@ const CoursesPage = () => {
   }
 
   if (coursesLoading || programsLoading) {
-    return <div className="p-6 text-[#111827] dark:text-white">Loading courses...</div>;
+    return <div className="p-6 text-[#111827] dark:text-[var(--text-main)]">Loading courses...</div>;
   }
 
   if (coursesError || programsError) {
@@ -72,21 +73,28 @@ const CoursesPage = () => {
   }
 
   return (
-    <div className="space-y-8 p-6 bg-white dark:bg-black min-h-screen">
+    <div className="space-y-8 p-6 bg-white dark:bg-[var(--layer-0)] min-h-screen">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-[#111827] dark:text-white">Courses</h1>
-        <p className="mt-2 text-lg text-[#6b7280] dark:text-[#888]">
-          {selectedProgram
-            ? `Select a course in ${selectedProgram.name}.`
-            : "Select a course."}
-        </p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/admin/programs')} className="text-[#374151] dark:text-[var(--text-main)]">
+            ← Back to Programs
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-[#111827] dark:text-[var(--text-main)]">Courses</h1>
+            <p className="mt-2 text-lg text-[#6b7280] dark:text-[var(--text-secondary)]">
+              {selectedProgram
+                ? `Select a course in ${selectedProgram.name}.`
+                : "Select a course."}
+            </p>
+          </div>
+        </div>
       </div>
 
       <Input
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="Search courses..."
-        className="max-w-md"
+        className="max-w-md bg-white dark:bg-[var(--layer-2)] border border-[#e5e7eb] rounded-md dark:border-[var(--layer-2-border)] dark:text-[var(--text-main)]"
       />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 md:grid-cols-2">

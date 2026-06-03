@@ -38,29 +38,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   });
 
   return (
-    <Sidebar variant="inset" {...props} className="bg-white dark:bg-[#1a1a1a] border-r border-[#e5e7eb] dark:border-[#333]">
-      <SidebarHeader className="bg-white dark:bg-[#1a1a1a] border-b border-[#e5e7eb] dark:border-[#333]">
+    <Sidebar variant="inset" {...props} className="bg-white dark:bg-[var(--layer-1)] border-r border-[#e5e7eb] dark:border-[var(--layer-2-border)]">
+      <SidebarHeader className="bg-white dark:bg-[var(--layer-1)] border-b border-[#e5e7eb] dark:border-[var(--layer-2-border)]">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
+              <SidebarMenuButton
               size="lg"
               asChild
-              className="h-auto py-3 hover:bg-[#f8f8f8] dark:hover:bg-[#2a2a2a] data-[state=open]:bg-[#f8f8f8] dark:data-[state=open]:bg-[#2a2a2a]"
+              className="h-auto py-3 hover:bg-[#f8f8f8] dark:hover:bg-[rgba(255,255,255,0.02)] data-[state=open]:bg-[#f8f8f8] dark:data-[state=open]:bg-[rgba(255,255,255,0.02)]"
             >
               <Link to="/admin">
                 <div className="flex flex-col items-center justify-center w-full">
-                  <SettingsIcon className="text-[#ef233c]" />
-                  <span className="text-sm font-semibold text-[#111827] dark:text-white">Admin</span>
+                  <SettingsIcon className="text-[#ef233c] dark:text-[var(--text-main)]" />
+                  <span className="text-sm font-semibold text-[#111827] dark:text-[var(--text-main)]">Admin</span>
                 </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <div className="border-b border-[#e5e7eb] dark:border-[#333] mx-2 mt-2" />
+        <div className="border-b border-[#e5e7eb] dark:border-[var(--layer-2-border)] mx-2 mt-2" />
       </SidebarHeader>
 
-      <SidebarContent className="bg-white dark:bg-[#1a1a1a]">
+      <SidebarContent className="bg-white dark:bg-[var(--layer-1)]">
         {isSettingsSection ? (
           <NavMain items={settingsTabs} />
         ) : (
@@ -77,9 +77,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
       </SidebarContent>
 
-      <div className="border-b border-[#e5e7eb] dark:border-[#333] mx-2 mt-2" />
+      <div className="border-b border-[#e5e7eb] dark:border-[var(--layer-2-border)] mx-2 mt-2" />
 
-      <SidebarFooter className="bg-white dark:bg-[#1a1a1a] border-t border-[#e5e7eb] dark:border-[#333]">
+      <SidebarFooter className="bg-white dark:bg-[var(--layer-1)] border-t border-[#e5e7eb] dark:border-[var(--layer-2-border)]">
         <NavUser
           user={{
             name: "John Doe",
