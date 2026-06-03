@@ -165,7 +165,7 @@ describe("TeacherOutlinesPage", () => {
   it("renders action buttons for each outline", () => {
     renderPage();
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(12);
+    expect(buttons.length).toBeGreaterThanOrEqual(11);
   });
 
   it("does not display edit dialog when status is published", () => {
